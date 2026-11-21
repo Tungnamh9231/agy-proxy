@@ -368,7 +368,7 @@ def get_claude_dir(custom_dir: str | Path | None = None) -> Path:
 
 def setup_claude(
     claude_dir: str | Path | None = None,
-    port: int = 8000,
+    port: int = 8001,
     model: str = "anthropic.gemini-3.8-flash-high",
     host: str = "127.0.0.1",
     proxy_url: str | None = None,

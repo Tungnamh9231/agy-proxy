@@ -10,7 +10,7 @@ Run `agy-proxy` as a persistent background daemon, inside Docker containers, or 
 ```bash
 docker run -d \
   --name agy-proxy \
-  -p 8000:8000 \
+  -p 8001:8001 \
   -v agy_data:/root/.config/agy-proxy \
   ghcr.io/kqlio67/agy-proxy:latest
 ```
@@ -24,7 +24,7 @@ services:
     container_name: agy-proxy
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8001:8001"
     volumes:
       - agy_data:/root/.config/agy-proxy
 
@@ -74,7 +74,7 @@ cd agy-proxy
 pip install -e .
 
 # 3. Start proxy:
-python -m agy_proxy.cli start --host 0.0.0.0 --port 8000
+python -m agy_proxy.cli start --host 0.0.0.0 --port 8001
 ```
 *(Tip: Binding to `0.0.0.0` allows your laptop or PC on the same Wi-Fi network to connect to your phone's proxy!)*
 

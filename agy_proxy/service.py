@@ -29,7 +29,7 @@ def get_service_file_path() -> Path:
         return Path.home() / ".config" / "agy-proxy" / "agy-proxy.service"
 
 
-def _resolve_exec_command(port: int = 8000, host: str = "127.0.0.1") -> list[str]:
+def _resolve_exec_command(port: int = 8001, host: str = "127.0.0.1") -> list[str]:
     """Determines the appropriate command to run the proxy server."""
     agy_bin = shutil.which("agy-proxy")
     if agy_bin:
@@ -37,7 +37,7 @@ def _resolve_exec_command(port: int = 8000, host: str = "127.0.0.1") -> list[str
     return [sys.executable, "-m", "agy_proxy.cli", "run", "--port", str(port), "--host", str(host)]
 
 
-def install_service(port: int = 8000, host: str = "127.0.0.1") -> tuple[bool, str]:
+def install_service(port: int = 8001, host: str = "127.0.0.1") -> tuple[bool, str]:
     """
     Installs and enables Antigravity Proxy as a user-level background service.
     Linux: systemd --user unit

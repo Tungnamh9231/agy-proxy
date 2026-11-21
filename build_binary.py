@@ -133,9 +133,9 @@ def build():
         print("==================================================\n")
         print("To run:")
         if system == "Windows":
-            print("  dist\\agy-proxy.exe --port 8000")
+            print("  dist\\agy-proxy.exe --port 8001")
         else:
-            print("  ./dist/agy-proxy --port 8000")
+            print("  ./dist/agy-proxy --port 8001")
     else:
         print(f"\n[ERROR] Output binary not found at {built_file}")
         sys.exit(1)

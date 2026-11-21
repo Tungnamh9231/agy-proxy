@@ -34,7 +34,7 @@ def test_tunnel_endpoints(client, tmp_path, monkeypatch):
     data = res_status.json()
     assert "configured_hosts" in data
 
-    res_snippet = client.get("/api/tunnel/snippet?port=8000")
+    res_snippet = client.get("/api/tunnel/snippet?port=8001")
     assert res_snippet.status_code == 200
     assert "export CLOUD_CODE_URL" in res_snippet.json()["snippet"]
 
@@ -103,24 +103,24 @@ def test_ide_settings_endpoints_lifecycle(client, tmp_path):
     settings_file.write_text('{"editor.tabSize": 2}\n', encoding="utf-8")
 
     res_st1 = client.get(
-        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8000"
+        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8001"
     )
     assert res_st1.status_code == 200
     assert res_st1.json()["configured"] is False
 
     res_apply = client.post(
         "/api/patch/ide-settings",
-        json={"settings_path": str(settings_file), "proxy_url": "http://127.0.0.1:8000"},
+        json={"settings_path": str(settings_file), "proxy_url": "http://127.0.0.1:8001"},
     )
     assert res_apply.status_code == 200
     assert res_apply.json()["success"] is True
 
     res_st2 = client.get(
-        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8000"
+        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8001"
     )
     assert res_st2.status_code == 200
     assert res_st2.json()["configured"] is True
-    assert res_st2.json()["jetski_cloud_code_url"] == "http://127.0.0.1:8000"
+    assert res_st2.json()["jetski_cloud_code_url"] == "http://127.0.0.1:8001"
 
     res_restore = client.post(
         "/api/patch/ide-settings/restore",
@@ -130,7 +130,7 @@ def test_ide_settings_endpoints_lifecycle(client, tmp_path):
     assert res_restore.json()["success"] is True
 
     res_st3 = client.get(
-        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8000"
+        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8001"
     )
     assert res_st3.json()["configured"] is False
 
@@ -244,3 +244,23 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
 
 
 
+
+
+
+def test_safety_settings_api_persists_and_validates(client, tmp_path, monkeypatch):
+    from agy_proxy import config
+
+    monkeypatch.setattr(config, "CONFIG_DIR", tmp_path / "agy-proxy")
+    monkeypatch.setattr(config, "CONFIG_FILE", tmp_path / "agy-proxy" / "config.json")
+
+    res_default = client.get("/api/safety/settings")
+    assert res_default.status_code == 200
+    assert res_default.json()["mode"] == "BLOCK_NONE"
+
+    res_off = client.post("/api/safety/settings", json={"mode": "OFF"})
+    assert res_off.status_code == 200
+    assert res_off.json()["mode"] == "OFF"
+    assert config.get_config_value("safety_settings_mode") == "OFF"
+
+    res_invalid = client.post("/api/safety/settings", json={"mode": "BLOCK_MEDIUM_AND_ABOVE"})
+    assert res_invalid.status_code == 400

@@ -147,7 +147,7 @@ class TestCliAuthCommands(unittest.TestCase):
     def test_print_banner_formatting(self):
         # Verify print_banner executes cleanly without raising any formatting exceptions
         with patch("agy_proxy.cli.console.print") as mock_print:
-            cli.print_banner(host="127.0.0.1", port=8000, pool=self.pool)
+            cli.print_banner(host="127.0.0.1", port=8001, pool=self.pool)
             self.assertTrue(mock_print.called)
 
     def test_print_banner_various_widths(self):
@@ -157,7 +157,7 @@ class TestCliAuthCommands(unittest.TestCase):
             buf = io.StringIO()
             test_console = Console(file=buf, width=width, force_terminal=False)
             with patch("agy_proxy.cli.console", test_console):
-                cli.print_banner(host="127.0.0.1", port=8000, pool=self.pool)
+                cli.print_banner(host="127.0.0.1", port=8001, pool=self.pool)
             out = buf.getvalue()
             self.assertIn("Google Antigravity AI Proxy", out)
             self.assertIn("Web Dashboard:", out)
@@ -179,7 +179,7 @@ class TestCliAuthCommands(unittest.TestCase):
         from rich.console import Console
         test_console = Console(file=buf, width=80, force_terminal=False)
         with patch("agy_proxy.cli.console", test_console):
-            cli.print_banner(host="127.0.0.1", port=8000, pool=self.pool)
+            cli.print_banner(host="127.0.0.1", port=8001, pool=self.pool)
         out = buf.getvalue()
         self.assertIn("more active account", out)
 
@@ -191,7 +191,7 @@ class TestCliAuthCommands(unittest.TestCase):
         buf = io.StringIO()
         test_console = Console(file=buf, width=80, force_terminal=False)
         with patch("agy_proxy.cli.console", test_console):
-            cli.print_banner(host="127.0.0.1", port=8000, pool=self.pool)
+            cli.print_banner(host="127.0.0.1", port=8001, pool=self.pool)
         out = buf.getvalue()
         self.assertIn("paused", out)
 
@@ -204,7 +204,7 @@ class TestCliAuthCommands(unittest.TestCase):
         buf_empty = io.StringIO()
         test_console2 = Console(file=buf_empty, width=80, force_terminal=False)
         with patch("agy_proxy.cli.console", test_console2):
-            cli.print_banner(host="127.0.0.1", port=8000, pool=empty_pool)
+            cli.print_banner(host="127.0.0.1", port=8001, pool=empty_pool)
         out_empty = buf_empty.getvalue()
         self.assertIn("No accounts configured yet", out_empty)
 
@@ -221,7 +221,7 @@ class TestCliAuthCommands(unittest.TestCase):
         with patch("agy_proxy.cli.console", test_console):
             cli.print_banner(
                 host="127.0.0.1",
-                port=8000,
+                port=8001,
                 pool=self.pool,
                 api_key="secret-proxy-key-12345",
                 update_info=update_info,
@@ -371,7 +371,7 @@ class TestCliLoggingFilters(unittest.TestCase):
         self.assertFalse(f.filter(make_record("= connection is CONNECTING")))
         self.assertFalse(f.filter(make_record("= connection is OPEN")))
         self.assertFalse(f.filter(make_record("< GET /v1/responses HTTP/1.1")))
-        self.assertFalse(f.filter(make_record("< host: 127.0.0.1:8000")))
+        self.assertFalse(f.filter(make_record("< host: 127.0.0.1:8001")))
         self.assertFalse(f.filter(make_record("> HTTP/1.1 101 Switching Protocols")))
         self.assertFalse(f.filter(make_record('> TEXT \'{"type": "response.output_text.delta"}\'')))
         self.assertFalse(f.filter(make_record("> PING ba ca 17 f9")))
@@ -390,7 +390,7 @@ class TestCodexCliCommand(unittest.TestCase):
     @patch("subprocess.run")
     def test_handle_run_codex_preserves_caller_cwd(self, mock_run, mock_which):
         with patch.dict(os.environ, {"AGY_CALLER_CWD": "/home/user/some-project"}):
-            cli.handle_run_codex(port=8000, model="gemini-3.8-flash-high")
+            cli.handle_run_codex(port=8001, model="gemini-3.8-flash-high")
             self.assertTrue(mock_run.called)
             _, kwargs = mock_run.call_args
             self.assertEqual(kwargs.get("cwd"), "/home/user/some-project")
@@ -401,7 +401,7 @@ class TestCodexCliCommand(unittest.TestCase):
         env_copy = dict(os.environ)
         env_copy.pop("AGY_CALLER_CWD", None)
         with patch.dict(os.environ, env_copy, clear=True):
-            cli.handle_run_codex(port=8000, model="gemini-3.8-flash-high")
+            cli.handle_run_codex(port=8001, model="gemini-3.8-flash-high")
             self.assertTrue(mock_run.called)
             _, kwargs = mock_run.call_args
             self.assertEqual(kwargs.get("cwd"), os.getcwd())
@@ -439,7 +439,7 @@ class TestClaudeCliCommand(unittest.TestCase):
     @patch("subprocess.run")
     def test_handle_run_claude_preserves_caller_cwd(self, mock_run, mock_which):
         with patch.dict(os.environ, {"AGY_CALLER_CWD": "/home/user/some-project"}):
-            cli.handle_run_claude(port=8000, model="anthropic.gemini-3.8-flash-high")
+            cli.handle_run_claude(port=8001, model="anthropic.gemini-3.8-flash-high")
             self.assertTrue(mock_run.called)
             _, kwargs = mock_run.call_args
             self.assertEqual(kwargs.get("cwd"), "/home/user/some-project")
@@ -450,7 +450,7 @@ class TestClaudeCliCommand(unittest.TestCase):
         env_copy = dict(os.environ)
         env_copy.pop("AGY_CALLER_CWD", None)
         with patch.dict(os.environ, env_copy, clear=True):
-            cli.handle_run_claude(port=8000, model="anthropic.gemini-3.8-flash-high")
+            cli.handle_run_claude(port=8001, model="anthropic.gemini-3.8-flash-high")
             self.assertTrue(mock_run.called)
             _, kwargs = mock_run.call_args
             self.assertEqual(kwargs.get("cwd"), os.getcwd())
@@ -500,7 +500,7 @@ class TestClaudeCliCommand(unittest.TestCase):
     @patch("subprocess.run")
     def test_handle_run_claude_no_mcp(self, mock_run, mock_which):
         cli.handle_run_claude(
-            port=8000,
+            port=8001,
             model="anthropic.gemini-3.8-flash-high",
             no_mcp=True,
         )
@@ -540,7 +540,7 @@ class TestClaudeCliCommand(unittest.TestCase):
     def test_handle_run_claude_selective_mcp(self, mock_run, mock_which):
         with patch("agy_proxy.claude_helper.get_installed_mcp_servers", return_value={"rea": {"command": "node"}}):
             cli.handle_run_claude(
-                port=8000,
+                port=8001,
                 mcp="rea",
             )
             self.assertTrue(mock_run.called)
@@ -557,7 +557,7 @@ class TestClaudeCliCommand(unittest.TestCase):
     @patch("subprocess.run")
     def test_handle_run_claude_strips_double_dash(self, mock_run, mock_which):
         cli.handle_run_claude(
-            port=8000,
+            port=8001,
             extra_args=["--", "-p", "hello"],
         )
         self.assertTrue(mock_run.called)
@@ -586,7 +586,7 @@ class TestClaudeCliCommand(unittest.TestCase):
     @patch("shutil.which", return_value="/usr/local/bin/claude")
     @patch("subprocess.run")
     def test_handle_run_claude_direct_env(self, mock_run, mock_which):
-        with patch.dict(os.environ, {"ANTHROPIC_BASE_URL": "http://127.0.0.1:8000"}):
+        with patch.dict(os.environ, {"ANTHROPIC_BASE_URL": "http://127.0.0.1:8001"}):
             cli.handle_run_claude(direct=True)
             self.assertTrue(mock_run.called)
             _, kwargs = mock_run.call_args
@@ -677,12 +677,12 @@ class TestCliV26Subcommands(unittest.TestCase):
             with patch.object(
                 sys,
                 "argv",
-                ["agy-proxy", "patch", "ide-settings", "--apply", "--url", "http://127.0.0.1:8000", "--settings-path", str(settings_path)],
+                ["agy-proxy", "patch", "ide-settings", "--apply", "--url", "http://127.0.0.1:8001", "--settings-path", str(settings_path)],
             ):
                 cli.main()
 
             data = json.loads(settings_path.read_text(encoding="utf-8"))
-            self.assertEqual(data["jetski.cloudCodeUrl"], "http://127.0.0.1:8000")
+            self.assertEqual(data["jetski.cloudCodeUrl"], "http://127.0.0.1:8001")
 
             with patch.object(
                 sys,
@@ -779,6 +779,14 @@ class TestCliV26Subcommands(unittest.TestCase):
             self.assertEqual(mock_run_acp.call_args.kwargs.get("account"), "dev@example.com")
             self.assertTrue(mock_run_acp.call_args.kwargs.get("danger"))
             mock_exit.assert_called_with(0)
+
+
+
+def test_default_proxy_server_port_is_8001():
+    from agy_proxy.cli import build_parser
+
+    args = build_parser().parse_args([])
+    assert args.port == 8001
 
 
 if __name__ == "__main__":

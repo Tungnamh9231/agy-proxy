@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 # Default Constants
 DEFAULT_PROXY_HOST = "127.0.0.1"
-DEFAULT_PROXY_PORT = 8000
+DEFAULT_PROXY_PORT = 8001
 DEFAULT_PROXY_URL = f"http://{DEFAULT_PROXY_HOST}:{DEFAULT_PROXY_PORT}"
 DEFAULT_WAIT_TIMEOUT = 2
 DEFAULT_WATCHDOG_LOG = Path(tempfile.gettempdir()) / "agy_ls_watchdog.log"
@@ -713,7 +713,7 @@ class LanguageServerPatcher:
             if cmdline_path.exists():
                 try:
                     cmdline = cmdline_path.read_text(errors="ignore")
-                    if ":8000" in cmdline or "127.0.0.1" in cmdline:
+                    if ":8001" in cmdline or "127.0.0.1" in cmdline:
                         mode = "proxy"
                     elif "googleapis.com" in cmdline:
                         mode = "direct"

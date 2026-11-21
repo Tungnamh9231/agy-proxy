@@ -199,7 +199,7 @@ def check_claude_cli() -> dict[str, Any]:
     }
 
 
-async def run_doctor(host: str = "127.0.0.1", port: int = 8000, cloudflare_url: str = None) -> bool:
+async def run_doctor(host: str = "127.0.0.1", port: int = 8001, cloudflare_url: str = None) -> bool:
     """Executes full diagnostic suite and prints beautiful report."""
     console.print(Panel("[bold cyan]🩺 Antigravity Proxy Diagnostic Doctor[/bold cyan]\n[dim]Checking system health, network endpoints, account tokens, and CLI integrations...[/dim]", border_style="blue"))
 

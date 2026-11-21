@@ -2514,8 +2514,8 @@ def create_app(
         host = body.get("host")
         if not host:
             raise HTTPException(status_code=400, detail="Missing host parameter")
-        remote_port = int(body.get("remote_port", 8000))
-        local_port = int(body.get("local_port", 8000))
+        remote_port = int(body.get("remote_port", 8001))
+        local_port = int(body.get("local_port", 8001))
         return tunnel_manager.configure_ssh_host(host, remote_port=remote_port, local_port=local_port)
 
     @app.post("/api/tunnel/start")
@@ -2525,8 +2525,8 @@ def create_app(
         target = body.get("target")
         if not target:
             raise HTTPException(status_code=400, detail="Missing target parameter")
-        remote_port = int(body.get("remote_port", 8000))
-        local_port = int(body.get("local_port", 8000))
+        remote_port = int(body.get("remote_port", 8001))
+        local_port = int(body.get("local_port", 8001))
         ssh_options = body.get("ssh_options")
         return tunnel_manager.start_tunnel(target, remote_port=remote_port, local_port=local_port, ssh_options=ssh_options)
 
@@ -2540,7 +2540,7 @@ def create_app(
         return tunnel_manager.stop_tunnel(target)
 
     @app.get("/api/tunnel/snippet")
-    async def get_tunnel_snippet(port: int = 8000):
+    async def get_tunnel_snippet(port: int = 8001):
         from agy_proxy.tunnel import tunnel_manager
         return {"snippet": tunnel_manager.get_remote_setup_snippet(remote_port=port)}
 
@@ -2597,7 +2597,7 @@ def create_app(
         host = request.url.hostname or "127.0.0.1"
         if host in ("testserver", "0.0.0.0", "::"):
             host = "127.0.0.1"
-        port = request.url.port or 8000
+        port = request.url.port or 8001
         return f"{scheme}://{host}:{port}"
 
     @app.get("/api/patch/ide-settings")
@@ -2670,6 +2670,27 @@ def create_app(
                 detail=res.get("error") or "Failed to restore IDE settings",
             )
         return res
+
+    @app.get("/api/safety/settings")
+    async def get_safety_settings_mode():
+        from agy_proxy.config import get_config_value
+
+        mode = str(get_config_value("safety_settings_mode", "BLOCK_NONE")).strip().upper()
+        if mode not in {"BLOCK_NONE", "OFF"}:
+            mode = "BLOCK_NONE"
+        return {"mode": mode}
+
+    @app.post("/api/safety/settings")
+    async def update_safety_settings_mode(request: Request):
+        from agy_proxy.config import set_config_value
+
+        body = await request.json()
+        mode = str(body.get("mode", "")).strip().upper() if isinstance(body, dict) else ""
+        if mode not in {"BLOCK_NONE", "OFF"}:
+            raise HTTPException(status_code=400, detail="mode must be BLOCK_NONE or OFF")
+        if not set_config_value("safety_settings_mode", mode):
+            raise HTTPException(status_code=500, detail="Could not save safety settings")
+        return {"status": "ok", "mode": mode}
 
     @app.get("/api/context/settings")
     async def get_compactor_settings():
@@ -3008,7 +3029,7 @@ def create_app(
     async def get_codex_status_endpoint(request: Request):
         """Returns installation and configuration status of OpenAI Codex CLI."""
         from agy_proxy.codex_helper import get_codex_status
-        port = request.url.port or 8000
+        port = request.url.port or 8001
         return get_codex_status(port=port)
 
     class CodexSetupRequest(BaseModel):
@@ -3019,7 +3040,7 @@ def create_app(
     async def setup_codex_endpoint(request: Request, req: CodexSetupRequest | None = None):
         """Automatically configures OpenAI Codex CLI with full models catalog and safe backup."""
         from agy_proxy.codex_helper import setup_codex
-        target_port = (req.port if req and req.port else None) or request.url.port or 8000
+        target_port = (req.port if req and req.port else None) or request.url.port or 8001
         target_model = (req.model if req and req.model else "gemini-3.8-flash-high")
         return setup_codex(port=target_port, model=target_model)
 

@@ -148,7 +148,7 @@ agy-proxy web --patched -v
 | `--download-server` | Download official standalone `language_server` binary for current OS/arch to `~/.config/agy-proxy/bin/` and exit. |
 | `-p, --port <port>` | HTTPS port for Antigravity Web UI (default: `44741`). |
 | `--host <host>` | Host address to bind Web UI (default: `127.0.0.1`). |
-| `--proxy-url <url>` | Proxy backend URL (default: `http://127.0.0.1:8000`). |
+| `--proxy-url <url>` | Proxy backend URL (default: `http://127.0.0.1:8001`). |
 | `-r, --restart` | Force restart Antigravity Web even if already running on port. |
 | `-s, --status` | Check real-time status of Antigravity Web server and RAM savings. |
 | `--detach` | Run Antigravity Web in background daemon mode. |

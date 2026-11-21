@@ -89,7 +89,7 @@ def update_toml_content(
 
 def setup_codex(
     codex_dir: str | None = None,
-    port: int = 8000,
+    port: int = 8001,
     model: str = "gemini-3.8-flash-high",
 ) -> dict[str, Any]:
     """
@@ -254,7 +254,7 @@ def restore_codex(codex_dir: str | None = None) -> dict[str, Any]:
     }
 
 
-def get_codex_status(codex_dir: str | None = None, port: int = 8000) -> dict[str, Any]:
+def get_codex_status(codex_dir: str | None = None, port: int = 8001) -> dict[str, Any]:
     """
     Checks if Codex CLI is installed and whether it is currently configured for Antigravity Proxy.
     """

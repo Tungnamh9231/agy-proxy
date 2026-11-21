@@ -251,7 +251,7 @@ class TestDashboardTemplate(unittest.TestCase):
 
     def test_dashboard_removes_gateway_status_pill_and_dims_disabled_cards(self):
         html = get_dashboard_html()
-        self.assertNotIn("Gateway :8000", html)
+        self.assertNotIn("Gateway :8001", html)
         self.assertNotIn("Gateway Status Pill", html)
 
         node_script = """

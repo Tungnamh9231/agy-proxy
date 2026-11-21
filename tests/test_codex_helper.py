@@ -63,17 +63,17 @@ class TestCodexHelper(unittest.TestCase):
         initial = '# Header comment\nexisting_key = "value"\nmodel = "old-model"\n'
         updates = {
             "model": "gemini-3.8-flash-high",
-            "openai_base_url": "http://127.0.0.1:8000/v1",
+            "openai_base_url": "http://127.0.0.1:8001/v1",
         }
         res = update_toml_content(initial, updates)
         self.assertIn('# Header comment', res)
         self.assertIn('existing_key = "value"', res)
         self.assertIn('model = "gemini-3.8-flash-high"', res)
-        self.assertIn('openai_base_url = "http://127.0.0.1:8000/v1"', res)
+        self.assertIn('openai_base_url = "http://127.0.0.1:8001/v1"', res)
 
     def test_setup_and_restore_codex(self):
         # 1. First setup on empty directory
-        res = setup_codex(codex_dir=self.codex_dir, port=8000)
+        res = setup_codex(codex_dir=self.codex_dir, port=8001)
         self.assertEqual(res["status"], "ok")
         config_file = os.path.join(self.codex_dir, "config.toml")
         catalog_file = os.path.join(self.codex_dir, "antigravity_models.json")
@@ -88,9 +88,9 @@ class TestCodexHelper(unittest.TestCase):
             self.assertIn('model_provider = "antigravity"', cfg_text)
             self.assertIn('[model_providers.antigravity]', cfg_text)
             self.assertIn('wire_api = "responses"', cfg_text)
-            self.assertIn('base_url = "http://127.0.0.1:8000/v1"', cfg_text)
+            self.assertIn('base_url = "http://127.0.0.1:8001/v1"', cfg_text)
 
-        status = get_codex_status(codex_dir=self.codex_dir, port=8000)
+        status = get_codex_status(codex_dir=self.codex_dir, port=8001)
         self.assertTrue(status["is_configured"])
         self.assertEqual(status["active_model"], "gemini-3.8-flash-high")
 
@@ -99,7 +99,7 @@ class TestCodexHelper(unittest.TestCase):
             f.write('\nuser_custom_setting = "preserved"\n')
 
         # 3. Re-run setup: should create backup because config already existed
-        res2 = setup_codex(codex_dir=self.codex_dir, port=8000, model="gemini-3.7-flash-high")
+        res2 = setup_codex(codex_dir=self.codex_dir, port=8001, model="gemini-3.7-flash-high")
         self.assertTrue(res2["backup_created"])
         backup_file = os.path.join(self.codex_dir, "config.toml.agy_backup")
         self.assertTrue(os.path.isfile(backup_file))
@@ -123,7 +123,7 @@ class TestCodexHelper(unittest.TestCase):
             self.assertNotIn('model_provider = "antigravity"', restored_text)
 
         # 5. Test clean in-place restore without backup file
-        res3 = setup_codex(codex_dir=self.codex_dir, port=8000)
+        res3 = setup_codex(codex_dir=self.codex_dir, port=8001)
         self.assertEqual(res3["status"], "ok")
         # Remove backup to simulate manual in-place clean
         if os.path.isfile(backup_file):

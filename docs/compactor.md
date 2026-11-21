@@ -29,14 +29,14 @@ When conversation history crosses your configured token threshold (default: 80,0
 
 ## ⚙️ Configuration (Web UI & REST API)
 
-Adjust compaction parameters in the Web Dashboard (`http://127.0.0.1:8000`) or via REST API:
+Adjust compaction parameters in the Web Dashboard (`http://127.0.0.1:8001`) or via REST API:
 
 ```bash
 # Get current compactor settings:
-curl -s http://127.0.0.1:8000/api/compactor/settings
+curl -s http://127.0.0.1:8001/api/compactor/settings
 
 # Update threshold to 75,000 tokens:
-curl -X POST http://127.0.0.1:8000/api/compactor/settings \
+curl -X POST http://127.0.0.1:8001/api/compactor/settings \
   -H "Content-Type: application/json" \
   -d '{
     "enabled": true,

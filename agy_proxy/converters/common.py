@@ -164,13 +164,31 @@ _CONVERSATION_TRANSCRIPT_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-DEFAULT_SAFETY_SETTINGS: list[dict[str, str]] = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_CIVIC_INTEGRITY", "threshold": "BLOCK_NONE"},
-]
+SAFETY_SETTING_CATEGORIES: tuple[str, ...] = (
+    "HARM_CATEGORY_HARASSMENT",
+    "HARM_CATEGORY_HATE_SPEECH",
+    "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "HARM_CATEGORY_CIVIC_INTEGRITY",
+)
+
+
+def get_safety_settings() -> list[dict[str, str]]:
+    """Return the configured Gemini safety thresholds, re-read for every request."""
+    try:
+        from agy_proxy.config import get_config_value
+
+        mode = str(get_config_value("safety_settings_mode", "BLOCK_NONE")).strip().upper()
+    except Exception:
+        mode = "BLOCK_NONE"
+
+    if mode not in {"BLOCK_NONE", "OFF"}:
+        mode = "BLOCK_NONE"
+    return [{"category": category, "threshold": mode} for category in SAFETY_SETTING_CATEGORIES]
+
+
+# Backwards-compatible import for external code; request builders use the dynamic getter.
+DEFAULT_SAFETY_SETTINGS: list[dict[str, str]] = get_safety_settings()
 
 
 def _should_strip_prompt_restrictions(strip_restrictions: bool | None = None) -> bool:
@@ -1016,6 +1034,7 @@ def extract_aspect_ratio(
 __all__ = [
     "DEFAULT_MODEL",
     "DEFAULT_SAFETY_SETTINGS",
+    "get_safety_settings",
     "DEFAULT_THOUGHT_SIGNATURE",
     "SUPPORTED_ASPECT_RATIOS",
     "_IMAGE_CACHE",

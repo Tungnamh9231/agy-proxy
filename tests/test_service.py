@@ -46,7 +46,7 @@ class TestServiceManagement(unittest.TestCase):
         target_file = Path(self.tmp_dir.name) / "agy-proxy.service"
         with patch("platform.system", return_value="Linux"), \
              patch("agy_proxy.service.get_service_file_path", return_value=target_file):
-            ok, msg = service.install_service(port=8000, host="127.0.0.1")
+            ok, msg = service.install_service(port=8001, host="127.0.0.1")
             self.assertTrue(ok)
             self.assertTrue(target_file.exists())
             content = target_file.read_text(encoding="utf-8")
@@ -60,7 +60,7 @@ class TestServiceManagement(unittest.TestCase):
         with patch("platform.system", return_value="Darwin"), \
              patch("agy_proxy.service.get_service_file_path", return_value=target_file), \
              patch("pathlib.Path.home", return_value=Path(self.tmp_dir.name)):
-            ok, msg = service.install_service(port=8000, host="127.0.0.1")
+            ok, msg = service.install_service(port=8001, host="127.0.0.1")
             self.assertTrue(ok)
             self.assertTrue(target_file.exists())
             content = target_file.read_text(encoding="utf-8")

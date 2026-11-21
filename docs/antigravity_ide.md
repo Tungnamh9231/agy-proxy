@@ -12,7 +12,7 @@ Antigravity IDE relies on a native Go backend (`language_server`) to communicate
 - **Preserves Original Binary**: Backs up the original compiled ELF/Mach-O binary as `language_server.real`.
 - **Startup Health-Check**: Tests `agy-proxy` availability on launch (configurable timeout, default 2 seconds).
 - **Background Watchdog**: Monitors proxy health and dynamically toggles routing:
-  - If `agy-proxy` is running: traffic routes through local proxy (`http://127.0.0.1:8000`).
+  - If `agy-proxy` is running: traffic routes through local proxy (`http://127.0.0.1:8001`).
   - If `agy-proxy` is offline: gracefully falls back to official Google upstream servers (`https://daily-cloudcode-pa.googleapis.com` and `https://generativelanguage.googleapis.com`).
 - **Clean 1-Command Reversion**: Restore original binaries at any time with `agy-proxy patch restore`.
 
@@ -65,7 +65,7 @@ agy-proxy patch status
 # Check status by pointing to an editor installation directory:
 agy-proxy patch status -e "/opt/Antigravity IDE"
 
-# Patch automatically (port 8000, startup wait & watchdog enabled):
+# Patch automatically (port 8001, startup wait & watchdog enabled):
 agy-proxy patch install -y
 
 # Patch by editor directory or specific binary:
@@ -103,7 +103,7 @@ Starting with Antigravity IDE v2.6.0+, you can route IDE model traffic through `
 # Check current IDE settings status:
 agy-proxy patch ide-settings --status
 
-# Apply zero-patch routing to proxy (default: http://127.0.0.1:8000):
+# Apply zero-patch routing to proxy (default: http://127.0.0.1:8001):
 agy-proxy patch ide-settings --apply
 
 # Apply with custom proxy URL:
@@ -184,7 +184,7 @@ Installed components:
 | `-u, --unpatch` | Restore the original `language_server` from backup and remove wrapper. |
 | `-f, --file <PATH>` | Directly specify path to `language_server` executable. |
 | `-d, --dir <PATH>` | Directory containing `language_server` executable or editor root. |
-| `-p, --port <PORT>` | Port where `agy-proxy` is listening (default: `8000` or `$PORT`). |
+| `-p, --port <PORT>` | Port where `agy-proxy` is listening (default: `8001` or `$PORT`). |
 | `-h, --host <HOST>` | Host where `agy-proxy` is listening (default: `127.0.0.1` or `$HOST`). |
 | `--url <URL>` | Full proxy base URL (e.g. `http://127.0.0.1:8080` or Cloudflare Worker URL). |
 | `--timeout <SECONDS>` | Max seconds to wait for proxy health-check at startup (default: `2`, `0` to disable). |

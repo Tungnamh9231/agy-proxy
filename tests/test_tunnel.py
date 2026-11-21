@@ -13,12 +13,12 @@ def test_ssh_tunnel_config_and_snippet(tmp_path):
     assert len(st["active_tunnels"]) == 0
 
     # Configure a new host
-    res = manager.configure_ssh_host("my-remote-server", remote_port=8000, local_port=8000)
+    res = manager.configure_ssh_host("my-remote-server", remote_port=8001, local_port=8001)
     assert res["success"] is True
     assert mock_config.exists()
     content = mock_config.read_text()
     assert "Host my-remote-server" in content
-    assert "RemoteForward 8000 127.0.0.1:8000" in content
+    assert "RemoteForward 8001 127.0.0.1:8001" in content
 
     # Configure again (idempotent / updating port)
     res2 = manager.configure_ssh_host("my-remote-server", remote_port=9000, local_port=9000)

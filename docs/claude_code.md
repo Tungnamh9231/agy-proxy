@@ -282,7 +282,7 @@ If you prefer running the standard `claude` command directly from your terminal 
 
 ### Configure to route through `agy-proxy`:
 ```bash
-agy-proxy setup-claude --port 8000 --model anthropic.gemini-3.8-flash-high
+agy-proxy setup-claude --port 8001 --model anthropic.gemini-3.8-flash-high
 ```
 *Injects proxy endpoints, token, 1M context limits, first-party assumption (`_CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL: "1"`), default Fable & Opus mappings, and interactive `/model` picker options with all next-gen models into `~/.claude/settings.json`, creating a backup `settings.json.agy_backup`.*
 

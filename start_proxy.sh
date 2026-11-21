@@ -21,7 +21,7 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
 # Detect port and host configuration from CLI args or environment
-PROXY_PORT="${PORT:-8000}"
+PROXY_PORT="${PORT:-8001}"
 PROXY_HOST="${HOST:-127.0.0.1}"
 
 args=("$@")

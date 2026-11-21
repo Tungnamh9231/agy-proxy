@@ -644,7 +644,7 @@ async def handle_update_command(check_only: bool = False):
         console.print(f"[bold red]❌ Automatic update failed:[/bold red] {res.get('output') or res.get('error')}")
         console.print("\n[bold yellow]Manual update command:[/bold yellow] `git pull origin main`")
 
-def handle_setup_codex(port: int = 8000, model: str = "gemini-3.8-flash-high"):
+def handle_setup_codex(port: int = 8001, model: str = "gemini-3.8-flash-high"):
     """Configures Codex CLI to use Antigravity Proxy with the full 25+ model catalog."""
     from agy_proxy.codex_helper import setup_codex
     res = setup_codex(port=port, model=model)
@@ -677,7 +677,7 @@ def handle_restore_codex():
 
 
 def handle_setup_claude(
-    port: int = 8000,
+    port: int = 8001,
     model: str = "anthropic.gemini-3.8-flash-high",
     url: str | None = None,
     direct: bool = False,
@@ -802,7 +802,7 @@ def handle_patch_claude_command(args: argparse.Namespace) -> None:
 
 
 def handle_run_claude(
-    port: int = 8000,
+    port: int = 8001,
     model: str = "anthropic.gemini-3.8-flash-high",
     url: str | None = None,
     danger: bool = False,
@@ -1047,7 +1047,7 @@ def handle_run_claude(
                 pass
 
 
-def handle_run_codex(port: int = 8000, model: str = "gemini-3.8-flash-high", extra_args: list = None):
+def handle_run_codex(port: int = 8001, model: str = "gemini-3.8-flash-high", extra_args: list = None):
     """Launches Codex CLI in ephemeral test mode with proxy and catalog without modifying ~/.codex/config.toml."""
     import shutil
     import subprocess
@@ -1095,7 +1095,7 @@ def handle_run_codex(port: int = 8000, model: str = "gemini-3.8-flash-high", ext
 
 
 def handle_run_agy(
-    port: int = 8000,
+    port: int = 8001,
     url: Optional[str] = None,
     account: Optional[str] = None,
     mode: Optional[str] = None,
@@ -1165,7 +1165,7 @@ def handle_run_agy(
 
 
 def handle_run_acp(
-    port: int = 8000,
+    port: int = 8001,
     url: Optional[str] = None,
     account: Optional[str] = None,
     danger: bool = False,
@@ -1361,7 +1361,7 @@ def handle_service_command(args: argparse.Namespace) -> None:
     from agy_proxy import service
 
     if action == "install":
-        port = getattr(args, "port", 8000)
+        port = getattr(args, "port", 8001)
         host = getattr(args, "host", "127.0.0.1")
         ok, msg = service.install_service(port=port, host=host)
         if ok:
@@ -1428,7 +1428,7 @@ def handle_patch_command(args: argparse.Namespace) -> None:
     proxy_url = getattr(args, "url", None)
     if not proxy_url:
         host = getattr(args, "host", "127.0.0.1")
-        port = getattr(args, "port", 8000)
+        port = getattr(args, "port", 8001)
         proxy_url = f"http://{host}:{port}"
 
     wait_timeout = 0 if getattr(args, "no_wait", False) else getattr(args, "timeout", 2)
@@ -1670,8 +1670,8 @@ def handle_tunnel_command(args: argparse.Namespace) -> None:
         if not host:
             console.print("[bold red]Please specify host or pattern (e.g. 'agy-proxy tunnel config dev-server')[/bold red]")
             sys.exit(1)
-        r_port = getattr(args, "remote_port", 8000)
-        l_port = getattr(args, "local_port", 8000)
+        r_port = getattr(args, "remote_port", 8001)
+        l_port = getattr(args, "local_port", 8001)
         res = tunnel_manager.configure_ssh_host(host, remote_port=r_port, local_port=l_port)
         if res.get("success"):
             console.print(f"[bold green]✓ {res.get('message')}[/bold green]")
@@ -1684,8 +1684,8 @@ def handle_tunnel_command(args: argparse.Namespace) -> None:
         if not target:
             console.print("[bold red]Please specify SSH target (e.g. 'agy-proxy tunnel connect user@server')[/bold red]")
             sys.exit(1)
-        r_port = getattr(args, "remote_port", 8000)
-        l_port = getattr(args, "local_port", 8000)
+        r_port = getattr(args, "remote_port", 8001)
+        l_port = getattr(args, "local_port", 8001)
         res = tunnel_manager.start_tunnel(target, remote_port=r_port, local_port=l_port)
         if res.get("success"):
             console.print(f"[bold green]✓ {res.get('message')}[/bold green]")
@@ -1705,7 +1705,7 @@ def handle_tunnel_command(args: argparse.Namespace) -> None:
             console.print(f"[bold red]❌ {res.get('error')}[/bold red]")
 
     elif action == "snippet":
-        port = getattr(args, "remote_port", 8000)
+        port = getattr(args, "remote_port", 8001)
         snippet = tunnel_manager.get_remote_setup_snippet(remote_port=port)
         console.print(snippet)
 
@@ -1923,7 +1923,7 @@ def build_parser() -> argparse.ArgumentParser:
     # doctor subcommand (agy-proxy doctor)
     doctor_parser = subparsers.add_parser("doctor", help="Run comprehensive health and diagnostic checks")
     doctor_parser.add_argument("--host", type=str, default="127.0.0.1", help="Proxy host to check")
-    doctor_parser.add_argument("--port", "-p", type=int, default=8000, help="Proxy port to check")
+    doctor_parser.add_argument("--port", "-p", type=int, default=8001, help="Proxy port to check")
 
     # bump subcommand (agy-proxy bump [patch|minor|major|<version>] [--dry-run])
     bump_parser = subparsers.add_parser("bump", help="Bump project version across __init__.py and pyproject.toml")
@@ -2013,8 +2013,8 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["claude-setup"],
         help="Configure Claude Code CLI (~/.claude/settings.json) to route through Antigravity Proxy",
     )
-    setup_claude_p.add_argument("--port", "-p", type=int, default=8000, help="Proxy server port (default: 8000)")
-    setup_claude_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8000)")
+    setup_claude_p.add_argument("--port", "-p", type=int, default=8001, help="Proxy server port (default: 8001)")
+    setup_claude_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8001)")
     setup_claude_p.add_argument("--model", "-m", type=str, default="anthropic.gemini-3.8-flash-high", help="Default model (default: anthropic.gemini-3.8-flash-high)")
     setup_claude_p.add_argument("--direct", action="store_true", help="Configure Claude Code for direct official Anthropic API with telemetry disabled & debloated settings")
     setup_claude_p.add_argument("--code-mode", action="store_true", help="Enable experimental Code Mode (CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1) in ~/.claude/settings.json")
@@ -2045,8 +2045,8 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["run-claude"],
         help="Launch Anthropic Claude Code CLI with proxy in ephemeral mode without modifying ~/.claude/settings.json",
     )
-    claude_run_p.add_argument("--port", type=int, default=8000, help="Proxy server port (default: 8000)")
-    claude_run_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8000)")
+    claude_run_p.add_argument("--port", type=int, default=8001, help="Proxy server port (default: 8001)")
+    claude_run_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8001)")
     claude_run_p.add_argument("--model", "-m", type=str, default="anthropic.gemini-3.8-flash-high", help="Model to use (default: anthropic.gemini-3.8-flash-high)")
     claude_run_p.add_argument(
         "--direct",
@@ -2090,7 +2090,7 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["codex-setup"],
         help="Configure OpenAI Codex CLI to use Antigravity Proxy with full model catalog",
     )
-    setup_codex_p.add_argument("--port", "-p", type=int, default=8000, help="Proxy server port (default: 8000)")
+    setup_codex_p.add_argument("--port", "-p", type=int, default=8001, help="Proxy server port (default: 8001)")
     setup_codex_p.add_argument("--model", "-m", type=str, default="gemini-3.8-flash-high", help="Default model (default: gemini-3.8-flash-high)")
 
     # restore-codex subcommand (agy-proxy restore-codex)
@@ -2106,7 +2106,7 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["run-codex"],
         help="Launch OpenAI Codex CLI with proxy in ephemeral mode without modifying ~/.codex/config.toml",
     )
-    codex_run_p.add_argument("--port", "-p", type=int, default=8000, help="Proxy server port (default: 8000)")
+    codex_run_p.add_argument("--port", "-p", type=int, default=8001, help="Proxy server port (default: 8001)")
     codex_run_p.add_argument("--model", "-m", type=str, default="gemini-3.8-flash-high", help="Model to use (default: gemini-3.8-flash-high)")
 
     # agy CLI runner (agy-proxy agy / agy-proxy cli)
@@ -2115,8 +2115,8 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["run-agy", "cli"],
         help="Launch Antigravity CLI (agy v1.5.5+) routed through agy-proxy with account & mode control",
     )
-    agy_run_p.add_argument("--port", "-p", type=int, default=8000, help="Proxy server port (default: 8000)")
-    agy_run_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8000)")
+    agy_run_p.add_argument("--port", "-p", type=int, default=8001, help="Proxy server port (default: 8001)")
+    agy_run_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8001)")
     agy_run_p.add_argument("--account", "-a", type=str, default=None, help="Target account ID or email from account pool (injected as AGY_ACCOUNT)")
     agy_run_p.add_argument("--mode", "-m", choices=["auto", "accept-edits", "plan"], default=None, help="Agent execution mode (auto, accept-edits, plan)")
     agy_run_p.add_argument("--effort", "-e", choices=["low", "medium", "high", "xhigh", "max"], default=None, help="Reasoning effort level (low|medium|high|xhigh|max)")
@@ -2139,8 +2139,8 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["run-acp"],
         help="Start Antigravity Agent Client Protocol (ACP) stdio server routed through agy-proxy for editor integration",
     )
-    acp_run_p.add_argument("--port", "-p", type=int, default=8000, help="Proxy server port (default: 8000)")
-    acp_run_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8000)")
+    acp_run_p.add_argument("--port", "-p", type=int, default=8001, help="Proxy server port (default: 8001)")
+    acp_run_p.add_argument("--url", type=str, default=None, help="Custom proxy base URL (e.g. http://127.0.0.1:8001)")
     acp_run_p.add_argument("--account", "-a", type=str, default=None, help="Target account ID or email from account pool (injected as AGY_ACCOUNT)")
     acp_run_p.add_argument(
         "--danger",
@@ -2176,7 +2176,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     web_parser.add_argument("--port", "-p", type=int, default=44741, help="HTTPS port for Antigravity Web UI (default: 44741)")
     web_parser.add_argument("--host", type=str, default="127.0.0.1", help="Host address to bind Web UI (default: 127.0.0.1)")
-    web_parser.add_argument("--proxy-url", type=str, default="http://127.0.0.1:8000", help="Antigravity Proxy URL (default: http://127.0.0.1:8000)")
+    web_parser.add_argument("--proxy-url", type=str, default="http://127.0.0.1:8001", help="Antigravity Proxy URL (default: http://127.0.0.1:8001)")
     web_parser.add_argument("--open", "-o", action="store_true", default=False, help="Open web browser on startup (default: False, disabled to avoid tab spam)")
     web_parser.add_argument("--no-open", action="store_true", default=False, help="Explicitly prevent opening web browser on startup")
     web_parser.add_argument("--browser", "-b", type=str, default=None, help="Custom browser executable to open (e.g. helium, google-chrome, firefox)")
@@ -2203,9 +2203,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     patch_parser.add_argument("-f", "--file", "--path", "--ls-path", dest="ls_path", default=None, help="Direct path to language_server file or editor directory")
     patch_parser.add_argument("-e", "--editor", default=None, help="Path to editor installation root (e.g. /opt/Antigravity)")
-    patch_parser.add_argument("--port", type=int, default=8000, help="Port where agy-proxy is running (default: 8000)")
+    patch_parser.add_argument("--port", type=int, default=8001, help="Port where agy-proxy is running (default: 8001)")
     patch_parser.add_argument("--host", default="127.0.0.1", help="Host where agy-proxy is running (default: 127.0.0.1)")
-    patch_parser.add_argument("--url", default=None, help="Full proxy URL (e.g. http://127.0.0.1:8000)")
+    patch_parser.add_argument("--url", default=None, help="Full proxy URL (e.g. http://127.0.0.1:8001)")
     patch_parser.add_argument("--timeout", type=int, default=2, help="Seconds to wait for agy-proxy before falling back to Google (default: 2)")
     patch_parser.add_argument("--no-wait", action="store_true", help="Disable waiting for agy-proxy before launching")
     patch_parser.add_argument("--no-watchdog", action="store_true", help="Disable background watchdog for dynamic live switching")
@@ -2217,9 +2217,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_inst.add_argument("target", nargs="?", default=None, help="Path to editor directory or language_server file")
     p_inst.add_argument("-f", "--file", "--path", "--ls-path", dest="ls_path", default=None, help="Direct path to language_server file or editor directory")
     p_inst.add_argument("-e", "--editor", default=None, help="Path to editor installation root (e.g. /opt/Antigravity)")
-    p_inst.add_argument("--port", type=int, default=8000, help="Port where agy-proxy is running (default: 8000)")
+    p_inst.add_argument("--port", type=int, default=8001, help="Port where agy-proxy is running (default: 8001)")
     p_inst.add_argument("--host", default="127.0.0.1", help="Host where agy-proxy is running (default: 127.0.0.1)")
-    p_inst.add_argument("--url", default=None, help="Full proxy URL (e.g. http://127.0.0.1:8000)")
+    p_inst.add_argument("--url", default=None, help="Full proxy URL (e.g. http://127.0.0.1:8001)")
     p_inst.add_argument("--timeout", type=int, default=2, help="Seconds to wait for agy-proxy before falling back to Google (default: 2)")
     p_inst.add_argument("--no-wait", action="store_true", help="Disable waiting for agy-proxy before launching")
     p_inst.add_argument("--no-watchdog", action="store_true", help="Disable background watchdog for dynamic live switching")
@@ -2263,9 +2263,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_ide.add_argument("--apply", action="store_true", help="Write jetski.cloudCodeUrl and antigravity.serverArgs to IDE settings.json")
     p_ide.add_argument("--restore", action="store_true", help="Remove agy-proxy routing keys from IDE settings.json")
     p_ide.add_argument("--status", action="store_true", help="Inspect IDE settings.json proxy routing status")
-    p_ide.add_argument("--url", default=None, help="Proxy URL to write (default: http://127.0.0.1:8000)")
+    p_ide.add_argument("--url", default=None, help="Proxy URL to write (default: http://127.0.0.1:8001)")
     p_ide.add_argument("--host", default="127.0.0.1", help="Proxy host (default: 127.0.0.1)")
-    p_ide.add_argument("--port", type=int, default=8000, help="Proxy port (default: 8000)")
+    p_ide.add_argument("--port", type=int, default=8001, help="Proxy port (default: 8001)")
     p_ide.add_argument("--settings-path", dest="settings_path", default=None, help="Explicit path to IDE User/settings.json")
 
     # config subcommand (agy-proxy config [get|set|list|reset])
@@ -2289,7 +2289,7 @@ def build_parser() -> argparse.ArgumentParser:
     service_sub = service_parser.add_subparsers(dest="service_action", help="Service action")
 
     srv_install = service_sub.add_parser("install", help="Install and enable user background service")
-    srv_install.add_argument("--port", type=int, default=8000, help="Port for background proxy service (default: 8000)")
+    srv_install.add_argument("--port", type=int, default=8001, help="Port for background proxy service (default: 8001)")
     srv_install.add_argument("--host", type=str, default="127.0.0.1", help="Host address to bind to (default: 127.0.0.1)")
 
     service_sub.add_parser("uninstall", help="Uninstall and remove background service")
@@ -2342,19 +2342,19 @@ def build_parser() -> argparse.ArgumentParser:
     tunnel_sub.add_parser("status", help="Show active reverse SSH tunnels and configured hosts")
     t_cfg = tunnel_sub.add_parser("config", help="Configure RemoteForward in ~/.ssh/config")
     t_cfg.add_argument("host", help="Host name or pattern in ~/.ssh/config")
-    t_cfg.add_argument("--remote-port", type=int, default=8000, help="Remote forward port (default: 8000)")
-    t_cfg.add_argument("--local-port", type=int, default=8000, help="Local proxy port (default: 8000)")
+    t_cfg.add_argument("--remote-port", type=int, default=8001, help="Remote forward port (default: 8001)")
+    t_cfg.add_argument("--local-port", type=int, default=8001, help="Local proxy port (default: 8001)")
 
     t_conn = tunnel_sub.add_parser("connect", aliases=["start"], help="Start background reverse SSH tunnel")
     t_conn.add_argument("target", help="SSH destination (e.g. user@remote-host)")
-    t_conn.add_argument("--remote-port", type=int, default=8000, help="Remote forward port (default: 8000)")
-    t_conn.add_argument("--local-port", type=int, default=8000, help="Local proxy port (default: 8000)")
+    t_conn.add_argument("--remote-port", type=int, default=8001, help="Remote forward port (default: 8001)")
+    t_conn.add_argument("--local-port", type=int, default=8001, help="Local proxy port (default: 8001)")
 
     t_stop = tunnel_sub.add_parser("stop", help="Stop background reverse SSH tunnel")
     t_stop.add_argument("target", help="SSH destination to stop tunnel for")
 
     t_snip = tunnel_sub.add_parser("snippet", help="Print remote environment setup script (no root required)")
-    t_snip.add_argument("--remote-port", type=int, default=8000, help="Remote forward port (default: 8000)")
+    t_snip.add_argument("--remote-port", type=int, default=8001, help="Remote forward port (default: 8001)")
 
     # Server arguments
     parser.add_argument(
@@ -2366,8 +2366,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--port",
         type=int,
-        default=int(os.environ.get("PORT", "8000")),
-        help="Port number to listen on (default: 8000)",
+        default=int(os.environ.get("PORT", "8001")),
+        help="Port number to listen on (default: 8001)",
     )
     parser.add_argument(
         "--token-file",
@@ -2501,7 +2501,7 @@ def main():
         from agy_proxy.doctor import run_doctor
         healthy = asyncio.run(run_doctor(
             host=getattr(args, "host", "127.0.0.1"),
-            port=getattr(args, "port", 8000),
+            port=getattr(args, "port", 8001),
             cloudflare_url=getattr(args, "cloudflare_url", None),
         ))
         sys.exit(0 if healthy else 1)
@@ -2593,7 +2593,7 @@ def main():
             return
     elif args.subcommand in ("setup-claude", "claude-setup"):
         handle_setup_claude(
-            port=getattr(args, "port", 8000),
+            port=getattr(args, "port", 8001),
             model=getattr(args, "model", "anthropic.gemini-3.8-flash-high"),
             url=getattr(args, "url", None),
             direct=getattr(args, "direct", False),
@@ -2608,7 +2608,7 @@ def main():
         return
     elif args.subcommand in ("claude", "run-claude"):
         handle_run_claude(
-            port=getattr(args, "port", 8000),
+            port=getattr(args, "port", 8001),
             model=getattr(args, "model", "anthropic.gemini-3.8-flash-high"),
             url=getattr(args, "url", None),
             danger=getattr(args, "danger", False),
@@ -2622,14 +2622,14 @@ def main():
         )
         return
     elif args.subcommand in ("setup-codex", "codex-setup"):
-        handle_setup_codex(port=getattr(args, "port", 8000), model=getattr(args, "model", "gemini-3.8-flash-high"))
+        handle_setup_codex(port=getattr(args, "port", 8001), model=getattr(args, "model", "gemini-3.8-flash-high"))
         return
     elif args.subcommand in ("restore-codex", "codex-restore"):
         handle_restore_codex()
         return
     elif args.subcommand in ("codex", "run-codex"):
         handle_run_codex(
-            port=getattr(args, "port", 8000),
+            port=getattr(args, "port", 8001),
             model=getattr(args, "model", "gemini-3.8-flash-high"),
             extra_args=getattr(args, "codex_args", []),
         )
@@ -2641,7 +2641,7 @@ def main():
         elif getattr(args, "no_auto_compact", False):
             auto_comp = False
         res = handle_run_agy(
-            port=getattr(args, "port", 8000),
+            port=getattr(args, "port", 8001),
             url=getattr(args, "url", None),
             account=getattr(args, "account", None),
             mode=getattr(args, "mode", None),
@@ -2655,7 +2655,7 @@ def main():
         return
     elif args.subcommand in ("acp", "run-acp"):
         res = handle_run_acp(
-            port=getattr(args, "port", 8000),
+            port=getattr(args, "port", 8001),
             url=getattr(args, "url", None),
             account=getattr(args, "account", None),
             danger=getattr(args, "danger", False),
@@ -2716,8 +2716,8 @@ def main():
         code = launch_antigravity_web(
             port=getattr(args, "port", 44741),
             host=getattr(args, "host", "127.0.0.1"),
-            proxy_url=getattr(args, "proxy_url", "http://127.0.0.1:8000"),
-            proxy_port=getattr(args, "proxy_port", 8000),
+            proxy_url=getattr(args, "proxy_url", "http://127.0.0.1:8001"),
+            proxy_port=getattr(args, "proxy_port", 8001),
             open_browser=getattr(args, "open", False) and not getattr(args, "no_open", False),
             browser=getattr(args, "browser", None),
             kill_electron=getattr(args, "kill_electron", False),
