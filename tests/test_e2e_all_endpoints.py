@@ -14,6 +14,7 @@ Verifies all entry/exit points:
 
 import asyncio
 import json
+import os
 import time
 import unittest
 import httpx
@@ -21,6 +22,10 @@ from agy_proxy.auth import AuthManager
 from agy_proxy.server import create_app
 
 
+@unittest.skipUnless(
+    os.environ.get("AGY_RUN_LIVE_E2E") == "1",
+    "Live E2E tests require a real Antigravity account and upstream access",
+)
 class TestE2EAllEndpoints(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls):
