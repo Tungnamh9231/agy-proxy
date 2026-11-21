@@ -175,9 +175,13 @@ def test_telemetry_sinkhole_and_set_user_settings(tmp_path, monkeypatch):
     assert res_info.json()["userSettings"]["customThemeFlag"] == "solarized"
 
 
-def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
+def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path, monkeypatch):
     from unittest.mock import AsyncMock, Mock
     from agy_proxy.auth import AccountSession
+    from agy_proxy import config
+
+    monkeypatch.setattr(config, "CONFIG_DIR", tmp_path / "agy-proxy")
+    monkeypatch.setattr(config, "CONFIG_FILE", tmp_path / "agy-proxy" / "config.json")
 
     pool = AccountPool(
         accounts_file=tmp_path / "accounts.json",
@@ -185,10 +189,12 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
         web_sessions_file=tmp_path / "web_sessions.json",
     )
     posted_urls = []
+    posted_kwargs = []
 
     class InspectClient:
         async def post(self, url, **kwargs):
             posted_urls.append(url)
+            posted_kwargs.append(kwargs)
             return Mock(
                 status_code=200,
                 text='{"ok": true}',
@@ -217,11 +223,16 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
     assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
 
     r2 = tc.post(
-        "/v1internal:streamGenerateContent",
+        "/v1internal:streamGenerateContent?alt=sse",
         json={"model": "gemini-3.8-flash-high", "request": {"contents": [{"role": "user", "parts": [{"text": "hi"}]}]}},
     )
     assert r2.status_code == 200
+    assert r2.headers["content-type"].startswith("text/event-stream")
+    assert r2.text.startswith("data: ")
     assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:generateContent"
+    assert "alt" not in posted_kwargs[-1].get("params", {})
+    sent_request = posted_kwargs[-1]["json"]["request"]
+    assert {item["threshold"] for item in sent_request["safetySettings"]} == {"BLOCK_NONE"}
 
     # Consumer account routes to daily-cloudcode-pa
     gcp_acc.enabled = False

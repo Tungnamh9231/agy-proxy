@@ -5016,6 +5016,9 @@ def create_app(
 
         query_params = dict(request.query_params)
         is_sse = query_params.get("alt") == "sse" or "alt=sse" in str(request.url)
+        # The public/internal client may ask for SSE, but CloudCode upstream is always unary.
+        if is_generation:
+            query_params.pop("alt", None)
         from agy_proxy.models import is_deepagent_model
         if is_generation:
             is_deep = is_deepagent_model(req_model) or any("deepagent" in str(x).lower() for x in (req_model, body))
@@ -5062,10 +5065,11 @@ def create_app(
         def _build_cc_target_url(cc_base_url: str) -> str:
             base = cc_base_url.rstrip("/")
             if action:
-                return f"{base}/v1internal:{action}"
+                normalized_action = "generateContent" if action == "streamGenerateContent" else action
+                return f"{base}/v1internal:{normalized_action}"
             elif clean_ap:
                 if "streamGenerateContent" in clean_ap:
-                    return f"{base}/v1internal:streamGenerateContent"
+                    return f"{base}/v1internal:generateContent"
                 elif "generateContent" in clean_ap:
                     return f"{base}/v1internal:generateContent"
                 elif clean_ap in COLON_ACTIONS or any(
@@ -5527,17 +5531,9 @@ def create_app(
                                         if is_system_role or should_clean_text(part["text"]):
                                             part["text"] = clean_system_prompt_text(part["text"])
 
-                    # Apply permissive safety settings to prevent false refusals on coding/debugging tasks
-                    candidate_body["request"]["safetySettings"] = [
-                        {"category": cat, "threshold": "BLOCK_NONE"}
-                        for cat in (
-                            "HARM_CATEGORY_HARASSMENT",
-                            "HARM_CATEGORY_HATE_SPEECH",
-                            "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                            "HARM_CATEGORY_DANGEROUS_CONTENT",
-                            "HARM_CATEGORY_CIVIC_INTEGRITY",
-                        )
-                    ]
+                    # Apply the Dashboard's saved Gemini threshold mode to direct IDE passthrough.
+                    from agy_proxy.converters.common import get_safety_settings
+                    candidate_body["request"]["safetySettings"] = get_safety_settings()
 
                     candidate_body["model"] = target_m
                     candidate_body["request"]["model"] = target_m
@@ -5584,7 +5580,7 @@ def create_app(
 
                 c = await acc.get_http_client()
 
-                is_streaming_call = is_generation and is_sse and isinstance(c, httpx.AsyncClient)
+                is_streaming_call = False  # Never request CloudCode SSE; downstream SSE is synthesized after unary completion.
                 resp = None
                 for req_attempt in range(2):
                     try:
@@ -5630,7 +5626,7 @@ def create_app(
                             c = await acc.get_http_client()
                             headers = await acc.get_auth_headers()
                             _apply_client_user_agent(headers)
-                            is_streaming_call = is_generation and is_sse and isinstance(c, httpx.AsyncClient)
+                            is_streaming_call = False  # Retry path also stays unary.
                             continue
                         raise
 
@@ -6287,6 +6283,21 @@ def create_app(
 
                     _record_cloudcode_traffic(acc, resp.status_code, data_dict=data, raw_text=resp.text if hasattr(resp, "text") else None)
                     processed_data = _process_passthrough_metadata(action_key, copy.deepcopy(data))
+                    if resp.status_code == 200 and is_generation and is_sse:
+                        async def unary_sse_response():
+                            # The client requested SSE; emit the completed unary result as one event.
+                            yield f"data: {json.dumps(processed_data)}\n\n"
+
+                        return StreamingResponse(
+                            unary_sse_response(),
+                            status_code=200,
+                            media_type="text/event-stream",
+                            headers={
+                                "Cache-Control": "no-cache",
+                                "Connection": "keep-alive",
+                                "X-Accel-Buffering": "no",
+                            },
+                        )
                     return JSONResponse(status_code=resp.status_code, content=processed_data)
                 except Exception:
                     _record_cloudcode_traffic(acc, resp.status_code, raw_text=resp.text if hasattr(resp, "text") else None)
