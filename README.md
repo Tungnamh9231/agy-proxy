@@ -69,10 +69,17 @@ Run without needing Python or manual virtual environment setup:
 
 ### 4. Open the Web Dashboard
 
-Open **`http://127.0.0.1:8000`** in your browser to:
+Open **`http://127.0.0.1:8001`** in your browser to:
 - Connect Google accounts via 1-click OAuth (PKCE) or add AI Studio API keys.
 - View real-time quotas, token analytics, and request metrics.
-- Configure context compactor thresholds and proxy tunneling.
+- Configure context compactor thresholds, proxy tunneling, and Gemini safety thresholds (`BLOCK_NONE` / `OFF`).
+
+
+### Gemini Safety & Upstream Generation Mode
+
+The OpenAI-compatible, Anthropic-compatible, and Gemini Native generation routes use CloudCode's unary `v1internal:generateContent` action upstream. Client-side SSE compatibility can remain enabled, but Google generation itself is requested as a complete response rather than via `streamGenerateContent?alt=sse`.
+
+In the Dashboard, open **Settings → Gemini Safety Settings** to switch the safety threshold sent with requests between `BLOCK_NONE` and `OFF`. The selection is saved in `~/.config/agy-proxy/config.json`. `OFF` only changes Gemini's configured harm-category threshold; it does not disable other platform-level safeguards.
 
 ---
 
@@ -208,7 +215,7 @@ Configure your clients using any of these supported model identifiers:
 ## ⌨️ Common CLI Cheat Sheet
 
 ```bash
-# Start proxy server on default port 8000:
+# Start proxy server on default port 8001:
 agy-proxy start
 
 # Start Antigravity in browser Web mode:

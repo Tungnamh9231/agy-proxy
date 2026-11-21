@@ -9,7 +9,7 @@ def create_image(width, height, color1, color2):
     dc.rectangle((0, height // 2, width // 2, height), fill=color2)
     return image
 
-def run_tray(port: int = 8000):
+def run_tray(port: int = 8001):
     def on_quit(icon, item):
         icon.stop()
         
@@ -24,7 +24,7 @@ def run_tray(port: int = 8000):
     
     icon.run()
 
-def start_tray_in_thread(port: int = 8000):
+def start_tray_in_thread(port: int = 8001):
     tray_thread = threading.Thread(target=run_tray, args=(port,), daemon=True)
     tray_thread.start()
     return tray_thread

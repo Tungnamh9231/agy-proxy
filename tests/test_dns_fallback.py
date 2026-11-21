@@ -25,12 +25,12 @@ class TestDnsFallback(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(_is_ip_or_local(b"oauth2.googleapis.com"))
 
     def test_patched_getaddrinfo_localhost(self):
-        res = patched_getaddrinfo("127.0.0.1", 8000, family=socket.AF_INET)
+        res = patched_getaddrinfo("127.0.0.1", 8001, family=socket.AF_INET)
         self.assertTrue(len(res) > 0)
         self.assertEqual(res[0][4][0], "127.0.0.1")
 
         # Test with bytes host
-        res_bytes = patched_getaddrinfo(b"127.0.0.1", 8000, family=socket.AF_INET)
+        res_bytes = patched_getaddrinfo(b"127.0.0.1", 8001, family=socket.AF_INET)
         self.assertTrue(len(res_bytes) > 0)
         self.assertEqual(res_bytes[0][4][0], "127.0.0.1")
 
@@ -44,7 +44,7 @@ class TestDnsFallback(unittest.IsolatedAsyncioTestCase):
         # Should not raise TypeError: run_in_executor unexpected keyword argument 'family'
         res = await loop.getaddrinfo(
             "127.0.0.1",
-            8000,
+            8001,
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
         )
@@ -54,7 +54,7 @@ class TestDnsFallback(unittest.IsolatedAsyncioTestCase):
         # Support bytes host from anyio/httpcore
         res_b = await loop.getaddrinfo(
             b"127.0.0.1",
-            8000,
+            8001,
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
         )

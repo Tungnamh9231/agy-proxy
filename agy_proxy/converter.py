@@ -11,6 +11,7 @@ from agy_proxy.converters.anthropic import anthropic_to_cloudcode_payload
 from agy_proxy.converters.common import (
     DEFAULT_MODEL,
     DEFAULT_SAFETY_SETTINGS,
+    get_safety_settings,
     DEFAULT_THOUGHT_SIGNATURE,
     _IMAGE_CACHE,
     _THOUGHT_SIGNATURE_CACHE,
@@ -47,6 +48,7 @@ __all__ = [
     "AnthropicRequest",
     "DEFAULT_MODEL",
     "DEFAULT_SAFETY_SETTINGS",
+    "get_safety_settings",
     "DEFAULT_THOUGHT_SIGNATURE",
     "OpenAIChatRequest",
     "_IMAGE_CACHE",

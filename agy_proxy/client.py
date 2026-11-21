@@ -17,7 +17,7 @@ import httpx
 from agy_proxy.auth import AccountPool, AuthManager, CLOUDCODE_BASE_URL, get_cloudcode_base_url
 from agy_proxy.cache import google_context_cache, session_affinity
 from agy_proxy.converter import (
-    DEFAULT_SAFETY_SETTINGS,
+    get_safety_settings,
     DEFAULT_THOUGHT_SIGNATURE,
     _extract_message_text,
     anthropic_to_cloudcode_payload,
@@ -635,7 +635,7 @@ class CloudCodeClient:
         timeout: float | httpx.Timeout | None = None,
         session_key: str | None = None,
         specific_account_id: str | None = None,
-        client_path: str = "/v1internal:streamGenerateContent",
+        client_path: str = "/v1internal:generateContent",
         is_streaming: bool = True,
         is_subcall: bool = False,
     ) -> AsyncGenerator[dict[str, Any], None]:
@@ -846,7 +846,7 @@ class CloudCodeClient:
                         except Exception as cache_err:
                             logger.debug("Context cache lookup bypassed: %s", cache_err)
 
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:streamGenerateContent?alt=sse&key={acc.refresh_token}"
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={acc.refresh_token}"
                     else:
                         project = await acc.initialize_project()
                         upstream_base = (
@@ -968,32 +968,55 @@ class CloudCodeClient:
                                 backend_sess_id = payload.get("request", {}).get("sessionId", f"sess-{uuid.uuid4().hex[:8]}")
                                 session_affinity.pin_session(session_key, acc.account_id, backend_sess_id)
 
-                            # Stream response chunks
+                            # generateContent is unary: buffer the full JSON response before parsing.
                             acc.total_requests += 1
                             acc.last_used_timestamp = time.time()
                             acc.last_used_model = backend_m
                             acc.last_client_type = api_source
-                            async for line in response.aiter_lines():
-                                line = line.strip()
-                                if not line:
-                                    continue
-                                if line.startswith("data:"):
-                                    raw_json = line[5:].strip()
-                                    if raw_json:
-                                        try:
-                                            data_obj = json.loads(raw_json)
-                                            # Normalize response wrapper for AI Studio / CloudCode
-                                            resp_meta = data_obj.get("response", data_obj)
-                                            if isinstance(resp_meta, dict):
-                                                usage_m = resp_meta.get("usageMetadata", {})
-                                                if isinstance(usage_m, dict):
-                                                    prompt_tokens = usage_m.get("promptTokenCount", prompt_tokens)
-                                                    candidates_tokens = usage_m.get("candidatesTokenCount", candidates_tokens)
-                                                    thoughts_tokens = usage_m.get("thoughtsTokenCount", thoughts_tokens)
-                                            has_yielded = True
-                                            yield data_obj
-                                        except json.JSONDecodeError as e:
-                                            logger.warning("Failed to decode SSE JSON chunk: %s", e)
+
+                            data_objects = []
+                            try:
+                                await response.aread()
+                            except Exception:
+                                pass
+
+                            try:
+                                decoded = response.json()
+                                if isinstance(decoded, dict):
+                                    data_objects = [decoded]
+                            except Exception:
+                                pass
+
+                            # Compatibility fallback for legacy SSE-shaped mocks/clients.
+                            if not data_objects:
+                                async for line in response.aiter_lines():
+                                    line = line.strip()
+                                    if not line:
+                                        continue
+                                    raw_json = line[5:].strip() if line.startswith("data:") else line
+                                    if raw_json in ("", "[DONE]"):
+                                        continue
+                                    try:
+                                        decoded = json.loads(raw_json)
+                                    except json.JSONDecodeError:
+                                        continue
+                                    if isinstance(decoded, dict):
+                                        data_objects.append(decoded)
+
+                            if not data_objects:
+                                raise RuntimeError("CloudCode generateContent returned an empty or invalid JSON response")
+
+                            for data_obj in data_objects:
+                                resp_meta = data_obj.get("response", data_obj)
+                                if isinstance(resp_meta, dict):
+                                    usage_m = resp_meta.get("usageMetadata", {})
+                                    if isinstance(usage_m, dict):
+                                        prompt_tokens = usage_m.get("promptTokenCount", prompt_tokens)
+                                        candidates_tokens = usage_m.get("candidatesTokenCount", candidates_tokens)
+                                        thoughts_tokens = usage_m.get("thoughtsTokenCount", thoughts_tokens)
+                                has_yielded = True
+                                yield data_obj
+
                             if not is_subcall:
                                 dur_ms = (time.time() - t0) * 1000
                                 try:
@@ -1363,7 +1386,7 @@ class CloudCodeClient:
 
         try:
             async for data in self._post_sse_stream_with_failover(
-                "v1internal:streamGenerateContent?alt=sse",
+                "v1internal:generateContent",
                 build_payload,
                 model_name=model,
                 session_key=sess_key,
@@ -1506,7 +1529,7 @@ class CloudCodeClient:
         cached_tokens = 0
 
         async for data in self._post_sse_stream_with_failover(
-            "v1internal:streamGenerateContent?alt=sse",
+            "v1internal:generateContent",
             build_payload,
             model_name=model,
             session_key=sess_key,
@@ -1738,7 +1761,7 @@ class CloudCodeClient:
         next_task: asyncio.Task[Any] | None = None
         try:
             stream_gen = self._post_sse_stream_with_failover(
-                "v1internal:streamGenerateContent?alt=sse",
+                "v1internal:generateContent",
                 build_payload,
                 model_name=model,
                 session_key=sess_key,
@@ -2029,7 +2052,7 @@ class CloudCodeClient:
         current_thought_sig: str | None = None
 
         async for data in self._post_sse_stream_with_failover(
-            "v1internal:streamGenerateContent?alt=sse",
+            "v1internal:generateContent",
             build_payload,
             model_name=model,
             session_key=sess_key,
@@ -2130,7 +2153,7 @@ class CloudCodeClient:
                     for part in si["parts"]:
                         if isinstance(part, dict) and "text" in part and isinstance(part["text"], str):
                             part["text"] = clean_system_prompt_text(part["text"])
-            sanitized_req["safetySettings"] = list(DEFAULT_SAFETY_SETTINGS)
+            sanitized_req["safetySettings"] = get_safety_settings()
             return {
                 "project": project_id,
                 "requestId": f"native/{uuid.uuid4()}",
@@ -2140,10 +2163,10 @@ class CloudCodeClient:
                 "requestType": "chat",
             }
 
-        eff_client_path = client_path or f"/v1beta/models/{model}:streamGenerateContent"
+        eff_client_path = client_path or f"/v1beta/models/{model}:generateContent"
         try:
             async for data in self._post_sse_stream_with_failover(
-                "v1internal:streamGenerateContent?alt=sse",
+                "v1internal:generateContent",
                 build_payload,
                 model_name=backend_model,
                 specific_account_id=specific_account_id,

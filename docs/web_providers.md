@@ -14,7 +14,7 @@ In addition to Google CloudCode OAuth and AI Studio API keys, `agy-proxy` integr
 | **ChatGPT Web** | `chatgpt-web` / `chatgpt-web-guest` | `gpt-4o`, `gpt-4o-mini`, `o3-mini`, `chatgpt-4o-latest` | Zero-Auth Guest or Auth Token | Reserve (`enabled: false`) | Zero-auth guest pipeline with vision & web search, unified prompt compaction and tool calling |
 
 > [!NOTE]
-> **Reserve-by-Default Guest Policy**: Starting in `v2.3.0`, zero-auth guest presets (`gemini-web-guest` and `chatgpt-web-guest`) default to `enabled: false` so your primary OAuth and API key pool handles traffic first. Enable them in the Web Dashboard (`http://127.0.0.1:8000`) whenever you want zero-auth reserve fallbacks.
+> **Reserve-by-Default Guest Policy**: Starting in `v2.3.0`, zero-auth guest presets (`gemini-web-guest` and `chatgpt-web-guest`) default to `enabled: false` so your primary OAuth and API key pool handles traffic first. Enable them in the Web Dashboard (`http://127.0.0.1:8001`) whenever you want zero-auth reserve fallbacks.
 
 ---
 

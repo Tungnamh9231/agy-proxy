@@ -44,7 +44,7 @@ logger = logging.getLogger("agy_proxy.web_launcher")
 console = Console()
 
 DEFAULT_WEB_PORT = 44741
-DEFAULT_PROXY_PORT = 8000
+DEFAULT_PROXY_PORT = 8001
 DEFAULT_PROXY_URL = f"http://127.0.0.1:{DEFAULT_PROXY_PORT}"
 DEFAULT_IDE_VERSION = "2.32.1"
 DEFAULT_BUNDLE_DIR = Path.home() / ".config" / "agy-proxy" / "web_ui"
@@ -2425,7 +2425,7 @@ def launch_antigravity_web(
     should_restart_for_mode_switch = False
     if running_standalone_details and is_port_in_use(port, host):
         cmd_str = running_standalone_details[0].get("cmd", "")
-        existing_points_to_proxy = "8000" in cmd_str or (effective_proxy_url and effective_proxy_url in cmd_str)
+        existing_points_to_proxy = "8001" in cmd_str or (effective_proxy_url and effective_proxy_url in cmd_str)
         desired_points_to_proxy = proxy_alive and not direct
 
         if existing_points_to_proxy and not desired_points_to_proxy:

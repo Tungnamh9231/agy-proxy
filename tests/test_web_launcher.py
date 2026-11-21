@@ -79,7 +79,7 @@ def test_build_web_args_with_proxy(tmp_path):
         ls_path=fake_bin,
         port=44741,
         csrf_token="my-token",
-        proxy_url="http://127.0.0.1:8000",
+        proxy_url="http://127.0.0.1:8001",
         ide_version="2.25.0",
     )
     assert str(fake_bin) in args
@@ -98,7 +98,7 @@ def test_build_web_args_with_proxy(tmp_path):
     assert "--disable_telemetry=true" in args
     assert "--persistent_mode=true" in args
     assert "--api_server_url" in args
-    assert "http://127.0.0.1:8000" in args
+    assert "http://127.0.0.1:8001" in args
     assert "--cloud_code_endpoint" in args
 
 
@@ -123,13 +123,13 @@ def test_build_web_args_direct_mode(tmp_path):
         ls_path=fake_bin,
         port=44741,
         csrf_token="my-token",
-        proxy_url="http://127.0.0.1:8000",
+        proxy_url="http://127.0.0.1:8001",
         direct=True,
     )
     assert "--standalone" in args
     assert "--api_server_url" in args
     assert DEFAULT_GOOGLE_API_URL in args
-    assert "http://127.0.0.1:8000" not in args
+    assert "http://127.0.0.1:8001" not in args
     assert "--cloud_code_endpoint" in args
     assert DEFAULT_GOOGLE_CC_ENDPOINT in args
 
@@ -938,21 +938,21 @@ def test_find_agy_cli_binary_and_build_hub_args(tmp_path, monkeypatch):
         agy_path=found,
         port=44888,
         csrf_token="tok_hub_1",
-        proxy_url="http://127.0.0.1:8000/",
+        proxy_url="http://127.0.0.1:8001/",
         direct=False,
     )
     assert str(found) == hub_proxy_args[0]
     assert "--hub" in hub_proxy_args
     assert "--hub-port=44888" in hub_proxy_args
     assert "--csrf_token=tok_hub_1" in hub_proxy_args
-    assert "--cloud_code_endpoint=http://127.0.0.1:8000" in hub_proxy_args
-    assert "--api_server_url=http://127.0.0.1:8000" in hub_proxy_args
+    assert "--cloud_code_endpoint=http://127.0.0.1:8001" in hub_proxy_args
+    assert "--api_server_url=http://127.0.0.1:8001" in hub_proxy_args
 
     hub_direct_args = build_hub_args(
         agy_path=found,
         port=44888,
         csrf_token="tok_hub_2",
-        proxy_url="http://127.0.0.1:8000",
+        proxy_url="http://127.0.0.1:8001",
         direct=True,
     )
     assert f"--cloud_code_endpoint={DEFAULT_GOOGLE_CC_ENDPOINT}" in hub_direct_args
@@ -1010,7 +1010,7 @@ def test_print_web_banner_full_paths(tmp_path):
             url="https://127.0.0.1:44741/",
             port=44741,
             csrf_token="test-token",
-            proxy_url="http://127.0.0.1:8000",
+            proxy_url="http://127.0.0.1:8001",
             proxy_active=True,
             ls_path=fake_bin,
             log_path=fake_log,

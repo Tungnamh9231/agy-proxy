@@ -17,7 +17,7 @@ from typing import Any
 
 logger = logging.getLogger("agy_proxy.tunnel")
 
-DEFAULT_TUNNEL_PORT = 8000
+DEFAULT_TUNNEL_PORT = 8001
 
 
 class SSHTunnelManager:

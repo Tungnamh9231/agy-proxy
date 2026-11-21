@@ -811,5 +811,43 @@ class TestCloudCodeClient(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(sent_payloads[0]["model"], "gemini-4-argon-high")
 
 
+    async def test_upstream_uses_unary_generate_content_endpoint(self):
+        """The Google upstream URL must use generateContent, never the SSE endpoint."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.request = httpx.Request(
+            "POST",
+            "https://daily-cloudcode-pa.googleapis.com/v1internal:generateContent",
+        )
+
+        async def response_lines():
+            yield '{"response":{"candidates":[{"content":{"parts":[{"text":"complete reply"}]}}]}}'
+
+        mock_response.aiter_lines = response_lines
+        mock_ctx = MagicMock()
+        mock_ctx.__aenter__ = AsyncMock(return_value=mock_response)
+        mock_ctx.__aexit__ = AsyncMock(return_value=None)
+
+        http_client = MagicMock()
+        http_client.stream = MagicMock(return_value=mock_ctx)
+        self.acc.initialize_project = AsyncMock(return_value="test-proj")
+        self.acc.get_auth_headers = AsyncMock(return_value={"Authorization": "Bearer test"})
+        self.acc.get_http_client = AsyncMock(return_value=http_client)
+
+        results = [
+            item async for item in self.client._post_sse_stream_with_failover(
+                endpoint="v1internal:generateContent",
+                payload_builder_fn=lambda project: {"project": project, "model": "gemini-3.8-flash-high"},
+                model_name="gemini-3.8-flash-high",
+            )
+        ]
+
+        assert len(results) == 1
+        assert results[0]["response"]["candidates"][0]["content"]["parts"][0]["text"] == "complete reply"
+        requested_url = http_client.stream.call_args.args[1]
+        assert requested_url.endswith("/v1internal:generateContent")
+        assert "streamGenerateContent" not in requested_url
+
+
 if __name__ == "__main__":
     unittest.main()

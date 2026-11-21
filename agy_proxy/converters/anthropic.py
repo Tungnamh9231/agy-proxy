@@ -10,7 +10,7 @@ from typing import Any
 
 from agy_proxy.converters.common import (
     DEFAULT_MODEL,
-    DEFAULT_SAFETY_SETTINGS,
+    get_safety_settings,
     DEFAULT_THOUGHT_SIGNATURE,
     _apply_thinking_config,
     _extract_media_from_url,
@@ -260,7 +260,7 @@ def anthropic_to_cloudcode_payload(
     inner_request: dict[str, Any] = {
         "contents": ensure_tool_pairing_integrity(contents),
         "generationConfig": generation_config,
-        "safetySettings": copy.deepcopy(DEFAULT_SAFETY_SETTINGS),
+        "safetySettings": get_safety_settings(),
     }
 
     if system_parts:

@@ -952,7 +952,7 @@
           </button>
           <button onclick="copySnippet('baseurl')" class="px-3 py-2 rounded-xl glass-pill hover:bg-indigo-500/20 hover:text-white hover:border-indigo-500/40 text-slate-200 text-xs font-mono transition flex items-center space-x-2 group shadow-sm" title="Copy API Base URL for Cursor/Cline">
             <i class="fa-solid fa-link text-cyan-400 group-hover:scale-110 transition text-xs"></i>
-            <span class="font-bold text-white">Base URL (:8000/v1)</span>
+            <span class="font-bold text-white">Base URL (:8001/v1)</span>
           </button>
         </div>
       </div>
@@ -969,7 +969,7 @@
               <i class="fa-regular fa-copy"></i><span>Copy</span>
             </button>
           </div>
-          <code id="codeOpenAiEndpoint" class="text-xs font-mono text-indigo-400 block truncate select-all">http://localhost:8000/v1</code>
+          <code id="codeOpenAiEndpoint" class="text-xs font-mono text-indigo-400 block truncate select-all">http://localhost:8001/v1</code>
           <p class="text-[10px] text-slate-400">For Codex CLI, Cursor, Windsurf, Cline, Continue.dev, Aider, and standard OpenAI SDK.</p>
         </div>
 
@@ -983,7 +983,7 @@
               <i class="fa-regular fa-copy"></i><span>Copy</span>
             </button>
           </div>
-          <code id="codeAnthropicEndpoint" class="text-xs font-mono text-purple-400 block truncate select-all">http://localhost:8000</code>
+          <code id="codeAnthropicEndpoint" class="text-xs font-mono text-purple-400 block truncate select-all">http://localhost:8001</code>
           <p class="text-[10px] text-slate-400">Use with ANTHROPIC_BASE_URL for Claude Code, Roo Code / Cline, Aider, and Anthropic SDK.</p>
         </div>
       </div>
@@ -1124,7 +1124,7 @@
         <div class="flex items-center space-x-2">
           <span class="text-xs font-mono text-slate-400">Endpoint:</span>
           <div class="flex items-center glass-well border border-white/[0.08] rounded-xl px-2.5 py-1 space-x-2">
-            <code id="endpointUrlText" class="text-xs font-mono text-indigo-400">http://localhost:8000/v1</code>
+            <code id="endpointUrlText" class="text-xs font-mono text-indigo-400">http://localhost:8001/v1</code>
             <button onclick="copySnippet('endpointUrlText', this)" class="text-slate-400 hover:text-white transition" title="Copy base URL">
               <i class="fa-regular fa-copy text-xs"></i>
             </button>
@@ -1271,7 +1271,7 @@ agy-proxy claude -m claude-sonnet-4-6</pre>
               <i class="fa-regular fa-copy"></i>
               <span>Copy</span>
             </button>
-            <pre id="codeCursor" class="text-slate-300 font-mono text-[11px] overflow-x-auto custom-scrollbar pr-12">Base URL: http://localhost:8000/v1
+            <pre id="codeCursor" class="text-slate-300 font-mono text-[11px] overflow-x-auto custom-scrollbar pr-12">Base URL: http://localhost:8001/v1
 API Key:  dummy
 Model:    gemini-3.7-flash-high</pre>
           </div>
@@ -1298,7 +1298,7 @@ Model:    gemini-3.7-flash-high</pre>
               <span>Copy</span>
             </button>
             <pre id="codeCodexCli" class="text-slate-300 font-mono text-[10.5px] overflow-x-auto custom-scrollbar pr-12"># 1-Line Launch:
-OPENAI_API_KEY="dummy" codex -c 'openai_base_url="http://localhost:8000/v1"' -m "gemini-3.8-flash-high"
+OPENAI_API_KEY="dummy" codex -c 'openai_base_url="http://localhost:8001/v1"' -m "gemini-3.8-flash-high"
 
 # Persistent config (~/.codex/config.toml) with native provider:
 # (Or run: agy-proxy setup-codex)
@@ -1307,9 +1307,9 @@ model = "gemini-3.8-flash-high"
 
 [model_providers.antigravity]
 name = "Antigravity Proxy"
-base_url = "http://localhost:8000/v1"
+base_url = "http://localhost:8001/v1"
 wire_api = "responses"
-model_catalog_url = "http://localhost:8000/api/codex/models.json"</pre>
+model_catalog_url = "http://localhost:8001/api/codex/models.json"</pre>
           </div>
         </div>
 
@@ -1334,7 +1334,7 @@ model_catalog_url = "http://localhost:8000/api/codex/models.json"</pre>
               <span>Copy</span>
             </button>
             <pre id="codeRooCode" class="text-slate-300 font-mono text-[11px] overflow-x-auto custom-scrollbar pr-12">Provider: OpenAI / Anthropic
-Base URL: http://localhost:8000/v1
+Base URL: http://localhost:8001/v1
 API Key:  dummy
 Model:    gemini-3.7-flash-high</pre>
           </div>
@@ -1365,7 +1365,7 @@ Model:    gemini-3.7-flash-high</pre>
     "title": "Antigravity",
     "provider": "openai",
     "model": "gemini-3.7-flash-high",
-    "apiBase": "http://localhost:8000/v1",
+    "apiBase": "http://localhost:8001/v1",
     "apiKey": "dummy"
   }]
 }</pre>
@@ -1392,7 +1392,7 @@ Model:    gemini-3.7-flash-high</pre>
               <i class="fa-regular fa-copy"></i>
               <span>Copy</span>
             </button>
-            <pre id="codeAider" class="text-slate-300 font-mono text-[11px] overflow-x-auto custom-scrollbar pr-12">OPENAI_API_BASE="http://localhost:8000/v1" OPENAI_API_KEY="dummy" aider --model openai/gemini-3.7-flash-high</pre>
+            <pre id="codeAider" class="text-slate-300 font-mono text-[11px] overflow-x-auto custom-scrollbar pr-12">OPENAI_API_BASE="http://localhost:8001/v1" OPENAI_API_KEY="dummy" aider --model openai/gemini-3.7-flash-high</pre>
           </div>
         </div>
 
@@ -1419,7 +1419,7 @@ Model:    gemini-3.7-flash-high</pre>
             <pre id="codePython" class="text-slate-300 font-mono text-[10px] overflow-x-auto custom-scrollbar pr-12">from openai import OpenAI
 
 client = OpenAI(
-  base_url="http://localhost:8000/v1",
+  base_url="http://localhost:8001/v1",
   api_key="dummy"
 )
 res = client.chat.completions.create(
@@ -1449,7 +1449,7 @@ res = client.chat.completions.create(
               <i class="fa-regular fa-copy"></i>
               <span>Copy</span>
             </button>
-            <pre id="codeGeminiNative" class="text-slate-300 font-mono text-[10px] overflow-x-auto custom-scrollbar pr-12">curl http://localhost:8000/v1beta/models/gemini-3.7-flash-high:streamGenerateContent   -H "Content-Type: application/json"   -d '{"contents":[{"role":"user","parts":[{"text":"Hi"}]}]}'</pre>
+            <pre id="codeGeminiNative" class="text-slate-300 font-mono text-[10px] overflow-x-auto custom-scrollbar pr-12">curl http://localhost:8001/v1beta/models/gemini-3.7-flash-high:streamGenerateContent   -H "Content-Type: application/json"   -d '{"contents":[{"role":"user","parts":[{"text":"Hi"}]}]}'</pre>
           </div>
         </div>
 
@@ -1474,7 +1474,7 @@ res = client.chat.completions.create(
               <span>Copy</span>
             </button>
             <pre id="codeCloudflare" class="text-slate-300 font-mono text-[10.5px] overflow-x-auto custom-scrollbar pr-12"># 1. Start Instant Tunnel
-cloudflared tunnel --url http://localhost:8000
+cloudflared tunnel --url http://localhost:8001
 
 # 2. Remote URL:
 https://your-tunnel.trycloudflare.com/v1</pre>
@@ -1691,6 +1691,30 @@ https://your-tunnel.trycloudflare.com/v1</pre>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Gemini Content Safety Mode -->
+    <div class="p-5 sm:p-6 rounded-3xl glass-card space-y-4 relative overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center">
+            <i class="fa-solid fa-shield-halved mr-2 text-amber-400"></i> Gemini Safety Settings
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Select the safety threshold sent with Gemini generation requests (CloudCode OAuth, AI Studio, and Gemini Native).</p>
+        </div>
+        <span class="text-[10px] font-mono text-slate-400 glass-pill px-2.5 py-1 rounded-full">Persistent setting</span>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+        <label for="safetySettingsMode" class="text-xs text-slate-300 font-semibold">Threshold mode</label>
+        <select id="safetySettingsMode" onchange="updateSafetySettings()" class="bg-slate-900/80 border border-white/[0.1] focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none sm:min-w-[180px]">
+          <option value="BLOCK_NONE">BLOCK_NONE</option>
+          <option value="OFF">OFF</option>
+        </select>
+        <span id="safetySettingsStatus" class="text-[11px] text-slate-400">Loading...</span>
+      </div>
+      <p class="text-[11px] text-slate-500 leading-relaxed">
+        OFF disables this Gemini harm-category threshold setting. It does not disable Google's other platform-level safeguards or guarantee that a request will be accepted.
+      </p>
     </div>
 
     <!-- Context Auto-Compactor & Summarizer Card -->
@@ -9204,6 +9228,42 @@ ${data.stderr || data.stdout || data.error || data.detail || res.statusText}`;
       } catch (e) {}
     }
 
+    async function loadSafetySettings() {
+      const select = document.getElementById('safetySettingsMode');
+      const status = document.getElementById('safetySettingsStatus');
+      try {
+        const res = await fetch('/api/safety/settings');
+        if (!res.ok) throw new Error('Could not load safety settings');
+        const data = await res.json();
+        if (select) select.value = data.mode || 'BLOCK_NONE';
+        if (status) status.textContent = 'Saved: ' + (data.mode || 'BLOCK_NONE');
+      } catch (e) {
+        if (status) status.textContent = 'Failed to load setting';
+      }
+    }
+
+    async function updateSafetySettings() {
+      const select = document.getElementById('safetySettingsMode');
+      const status = document.getElementById('safetySettingsStatus');
+      const mode = select ? select.value : 'BLOCK_NONE';
+      if (status) status.textContent = 'Saving...';
+      try {
+        const res = await fetch('/api/safety/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Could not save safety settings');
+        if (status) status.textContent = 'Saved: ' + data.mode;
+        showToast('Gemini safety threshold set to ' + data.mode, 'success');
+      } catch (e) {
+        if (status) status.textContent = 'Save failed';
+        showToast('Failed to save safety setting: ' + e.message, 'error');
+        await loadSafetySettings();
+      }
+    }
+
     let currentCompactorModel = 'gemini-3.8-flash-low';
 
     async function loadCompactorSettings() {
@@ -9353,7 +9413,7 @@ ${data.stderr || data.stdout || data.error || data.detail || res.statusText}`;
       if (!document.hidden && currentActiveTab === 'settings') {
         pollProcessStatus();
       }
-    }, 8000);
+    }, 8001);
 
     async function controlProcess(procName, action) {
       try {
@@ -10062,6 +10122,7 @@ ${data.stderr || data.stdout || data.error || data.detail || res.statusText}`;
       loadModels();
     });
     loadCompactorSettings();
+    loadSafetySettings();
     initAutoRefresh();
     checkForSoftwareUpdates();
     updateCacheStats();

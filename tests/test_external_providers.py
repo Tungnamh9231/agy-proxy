@@ -55,7 +55,7 @@ def test_external_provider_manager_lifecycle(tmp_path):
         id="custom-llm",
         name="Custom LLM",
         provider_type="openai_compatible",
-        base_url="http://localhost:8000/v1",
+        base_url="http://localhost:8001/v1",
         api_key="sk-test",
         models=[
             ExternalModelConfig(id="custom-model-1", name="Custom Model 1"),

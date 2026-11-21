@@ -7,7 +7,7 @@
 ## ➕ Adding Accounts
 
 ### 1. Via Web Dashboard
-Navigate to `http://127.0.0.1:8000` in your browser:
+Navigate to `http://127.0.0.1:8001` in your browser:
 - Click **"Add Account"** -> **Google OAuth (PKCE)** to connect personal/work Google accounts with 1 click.
 - Click **"Add API Key"** to add Google AI Studio keys (`AIzaSy...`).
 - View real-time quota bars, requests count, and remaining tokens per account.

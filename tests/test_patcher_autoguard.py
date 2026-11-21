@@ -9,7 +9,7 @@ def test_desktop_launcher(tmp_path, monkeypatch):
     monkeypatch.setattr(DesktopLauncher, "get_cli_wrapper_path", lambda *args: mock_local / "bin" / "antigravity")
     monkeypatch.setattr(DesktopLauncher, "get_agy_cli_wrapper_path", lambda *args: mock_local / "bin" / "agy-proxy-exec")
 
-    launcher = DesktopLauncher(proxy_url="http://127.0.0.1:8000")
+    launcher = DesktopLauncher(proxy_url="http://127.0.0.1:8001")
 
     # Initially not installed
     st1 = launcher.status()
@@ -26,12 +26,12 @@ def test_desktop_launcher(tmp_path, monkeypatch):
 
     # Check content
     cli_content = Path(st2["cli_wrapper_path"]).read_text()
-    assert "export CLOUD_CODE_URL=\"http://127.0.0.1:8000\"" in cli_content
+    assert "export CLOUD_CODE_URL=\"http://127.0.0.1:8001\"" in cli_content
 
     # If agy binary was found on system, agy-proxy-exec was created
     if st2.get("agy_cli_wrapper_installed"):
         agy_wrap_content = Path(st2["agy_cli_wrapper_path"]).read_text()
-        assert "export CLOUD_CODE_URL=\"http://127.0.0.1:8000\"" in agy_wrap_content
+        assert "export CLOUD_CODE_URL=\"http://127.0.0.1:8001\"" in agy_wrap_content
 
     # Uninstall
     res_un = launcher.uninstall()
@@ -43,8 +43,8 @@ def test_desktop_launcher(tmp_path, monkeypatch):
 
 
 def test_windows_dll_proxy_helper():
-    ps_code = WindowsDllProxy.generate_powershell_launcher(proxy_url="http://127.0.0.1:8000")
-    assert "$env:CLOUD_CODE_URL = \"http://127.0.0.1:8000\"" in ps_code
+    ps_code = WindowsDllProxy.generate_powershell_launcher(proxy_url="http://127.0.0.1:8001")
+    assert "$env:CLOUD_CODE_URL = \"http://127.0.0.1:8001\"" in ps_code
     assert "Start-Process $antigravityExe" in ps_code
 
 

@@ -121,7 +121,7 @@ class TestLanguageServerPatcher(unittest.TestCase):
 
         self.patcher = LanguageServerPatcher(
             target_path=self.ls_file,
-            proxy_url="http://127.0.0.1:8000",
+            proxy_url="http://127.0.0.1:8001",
             wait_timeout=2,
             enable_watchdog=True,
         )
@@ -213,7 +213,7 @@ class TestAntigravityIDESettingsConfigurator(unittest.TestCase):
         )
 
         cfg = AntigravityIDESettingsConfigurator(
-            proxy_url="http://127.0.0.1:8000",
+            proxy_url="http://127.0.0.1:8001",
             settings_path=self.settings_path,
         )
 
@@ -231,11 +231,11 @@ class TestAntigravityIDESettingsConfigurator(unittest.TestCase):
 
         parsed = json.loads(self.settings_path.read_text(encoding="utf-8"))
         self.assertEqual(parsed["editor.fontSize"], 14)
-        self.assertEqual(parsed["jetski.cloudCodeUrl"], "http://127.0.0.1:8000")
+        self.assertEqual(parsed["jetski.cloudCodeUrl"], "http://127.0.0.1:8001")
         args = parsed["antigravity.serverArgs"]
         self.assertIn("--custom-flag=1", args)
-        self.assertEqual(args.count("--cloud_code_endpoint=http://127.0.0.1:8000"), 1)
-        self.assertEqual(args.count("--api_server_url=http://127.0.0.1:8000"), 1)
+        self.assertEqual(args.count("--cloud_code_endpoint=http://127.0.0.1:8001"), 1)
+        self.assertEqual(args.count("--api_server_url=http://127.0.0.1:8001"), 1)
         self.assertNotIn("--cloud_code_endpoint=http://old:9999", args)
 
         bak_file = self.settings_path.with_name("settings.json.agy_proxy_bak")

@@ -10,7 +10,7 @@ Configure popular AI code editors and CLI agents to route through `agy-proxy` us
 2. Enable **OpenAI API Key** and enter any dummy text (e.g. `dummy` or `sk-antigravity`).
 3. Click **Override OpenAI Base URL** and set:
    ```
-   http://127.0.0.1:8000/v1
+   http://127.0.0.1:8001/v1
    ```
 4. In the model selector, add custom model names supported by `agy-proxy`:
    - `gemini-4-neon-high` / `gemini-4-hydrogen-high`
@@ -27,7 +27,7 @@ Configure popular AI code editors and CLI agents to route through `agy-proxy` us
 2. Select **OpenAI Compatible Endpoint**.
 3. Set **Base URL**:
    ```
-   http://127.0.0.1:8000/v1
+   http://127.0.0.1:8001/v1
    ```
 4. Set **API Key**: `dummy`.
 5. Enter model name: `gemini-3.8-flash-high`.
@@ -43,12 +43,12 @@ models:
   - name: "Gemini 3.8 Flash (Antigravity)"
     provider: "openai"
     model: "gemini-3.8-flash-high"
-    apiBase: "http://127.0.0.1:8000/v1"
+    apiBase: "http://127.0.0.1:8001/v1"
     apiKey: "dummy"
   - name: "Claude Sonnet 4.6 (Antigravity)"
     provider: "anthropic"
     model: "claude-sonnet-4-6"
-    apiBase: "http://127.0.0.1:8000"
+    apiBase: "http://127.0.0.1:8001"
     apiKey: "dummy"
 ```
 
@@ -60,7 +60,7 @@ Roo Code and Cline require robust tool calling and strict schema compatibility. 
 
 ### Provider Configuration
 - **API Provider**: `OpenAI Compatible` or `Anthropic`
-- **Base URL**: `http://127.0.0.1:8000/v1` (for OpenAI) or `http://127.0.0.1:8000` (for Anthropic)
+- **Base URL**: `http://127.0.0.1:8001/v1` (for OpenAI) or `http://127.0.0.1:8001` (for Anthropic)
 - **API Key**: `dummy`
 - **Model ID**: `gemini-3.8-flash-high` or `claude-sonnet-4-6`
 
@@ -102,12 +102,12 @@ agy-proxy acp --danger
 
 ```bash
 # Using OpenAI compatible endpoint:
-OPENAI_API_BASE="http://127.0.0.1:8000/v1" \
+OPENAI_API_BASE="http://127.0.0.1:8001/v1" \
 OPENAI_API_KEY="dummy" \
 aider --model openai/gemini-3.8-flash-high
 
 # Using Anthropic compatible endpoint:
-ANTHROPIC_BASE_URL="http://127.0.0.1:8000" \
+ANTHROPIC_BASE_URL="http://127.0.0.1:8001" \
 ANTHROPIC_API_KEY="dummy" \
 aider --model anthropic/claude-sonnet-4-6
 ```

@@ -49,7 +49,7 @@ Expose your local `agy-proxy` to the internet with secure SSL in 1 command witho
 
 ```bash
 # Start Cloudflare Tunnel:
-cloudflared tunnel --url http://localhost:8000
+cloudflared tunnel --url http://localhost:8001
 ```
 
 Use the generated temporary URL (e.g. `https://<random>.trycloudflare.com/v1`) in your mobile devices, remote servers, or external clients.

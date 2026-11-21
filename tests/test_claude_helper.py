@@ -32,7 +32,7 @@ class TestClaudeHelper(unittest.TestCase):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_setup_claude_fresh(self):
-        res = setup_claude(claude_dir=self.claude_dir, port=8000, model="anthropic.gemini-3.8-flash-high")
+        res = setup_claude(claude_dir=self.claude_dir, port=8001, model="anthropic.gemini-3.8-flash-high")
         self.assertTrue(res["ok"])
         settings_file = self.claude_dir / "settings.json"
         self.assertTrue(settings_file.is_file())
@@ -45,7 +45,7 @@ class TestClaudeHelper(unittest.TestCase):
         self.assertIn("modelSettings", data)
         self.assertEqual(data["modelSettings"]["anthropic.gemini-3.8-flash-high"]["autoCompactWindow"], 800000)
         self.assertIn("env", data)
-        self.assertEqual(data["env"]["ANTHROPIC_BASE_URL"], "http://127.0.0.1:8000")
+        self.assertEqual(data["env"]["ANTHROPIC_BASE_URL"], "http://127.0.0.1:8001")
         self.assertEqual(data["env"]["ANTHROPIC_AUTH_TOKEN"], "agy-proxy-token")
         self.assertEqual(data["env"]["ANTHROPIC_API_KEY"], "")
         self.assertEqual(data["env"]["_CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL"], "1")
@@ -62,7 +62,7 @@ class TestClaudeHelper(unittest.TestCase):
         self.assertTrue(len(data["modelPicker"]["options"]) > 0)
 
     def test_setup_claude_code_mode(self):
-        res = setup_claude(claude_dir=self.claude_dir, port=8000, code_mode=True)
+        res = setup_claude(claude_dir=self.claude_dir, port=8001, code_mode=True)
         self.assertTrue(res["ok"])
         self.assertTrue(res["code_mode"])
         settings_file = self.claude_dir / "settings.json"

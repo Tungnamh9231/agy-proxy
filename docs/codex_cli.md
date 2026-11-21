@@ -32,7 +32,7 @@ Automatically update your global Codex settings:
 
 ```bash
 # Configure ~/.codex/config.toml with native Antigravity model provider and catalog:
-agy-proxy setup-codex --port 8000 --model gemini-3.8-flash-high
+agy-proxy setup-codex --port 8001 --model gemini-3.8-flash-high
 
 # Or restore original config at any time:
 agy-proxy restore-codex
@@ -48,9 +48,9 @@ model_catalog_json = "~/.codex/antigravity_models.json"
 
 [model_providers.antigravity]
 name = "Antigravity Proxy"
-base_url = "http://127.0.0.1:8000/v1"
+base_url = "http://127.0.0.1:8001/v1"
 wire_api = "responses"
-model_catalog_url = "http://127.0.0.1:8000/api/codex/models.json"
+model_catalog_url = "http://127.0.0.1:8001/api/codex/models.json"
 ```
 
 > **Note on Compatibility:**

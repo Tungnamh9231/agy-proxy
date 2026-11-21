@@ -34,11 +34,11 @@ npx wrangler deploy
 #### 2. Start `agy-proxy` with the Worker URL
 ```bash
 # Using CLI flag:
-agy-proxy --port 8000 --cloudflare-url "https://agy-proxy-edge.<your-subdomain>.workers.dev"
+agy-proxy --port 8001 --cloudflare-url "https://agy-proxy-edge.<your-subdomain>.workers.dev"
 
 # OR via environment variable:
 export CLOUDFLARE_UPSTREAM_URL="https://agy-proxy-edge.<your-subdomain>.workers.dev"
-agy-proxy --port 8000
+agy-proxy --port 8001
 ```
 
 ---
@@ -117,7 +117,7 @@ If you run `agy-proxy` locally and just want a quick public HTTPS URL without de
 
 ```bash
 # Start an instant tunnel
-cloudflared tunnel --url http://127.0.0.1:8000
+cloudflared tunnel --url http://127.0.0.1:8001
 ```
 
 `cloudflared` will generate a public URL like:

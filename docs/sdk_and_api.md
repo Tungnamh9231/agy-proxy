@@ -15,7 +15,7 @@ from google.genai import types
 client = genai.Client(
     api_key="dummy",
     http_options=types.HttpOptions(
-        base_url="http://127.0.0.1:8000"
+        base_url="http://127.0.0.1:8001"
     )
 )
 
@@ -32,7 +32,7 @@ from openai import OpenAI
 
 # Standard OpenAI client configured with agy-proxy
 client = OpenAI(
-    base_url="http://127.0.0.1:8000/v1",
+    base_url="http://127.0.0.1:8001/v1",
     api_key="dummy"
 )
 
@@ -53,7 +53,7 @@ from anthropic import Anthropic
 
 # Standard Anthropic client configured with agy-proxy
 client = Anthropic(
-    base_url="http://127.0.0.1:8000",
+    base_url="http://127.0.0.1:8001",
     api_key="dummy"
 )
 
@@ -71,7 +71,7 @@ print(response.content[0].text)
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url="http://127.0.0.1:8000/v1", api_key="dummy")
+client = OpenAI(base_url="http://127.0.0.1:8001/v1", api_key="dummy")
 
 # Text-to-Image Generation (with dynamic aspect ratio support: 1:1, 16:9, 4:3, 21:9):
 img_res = client.images.generate(
@@ -95,7 +95,7 @@ edit_res = client.images.edit(
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `AGY_PORT` / `PORT` | `8000` | Port for the proxy HTTP/REST server to listen on. |
+| `AGY_PORT` / `PORT` | `8001` | Port for the proxy HTTP/REST server to listen on. |
 | `AGY_HOST` / `HOST` | `127.0.0.1` | Network interface host to bind to (`0.0.0.0` for all interfaces). |
 | `AGY_CONFIG_DIR` | `~/.config/agy-proxy` | Directory where configuration, account tokens, and caches are persisted. |
 | `AGY_UPSTREAM_PROXY` | *(None)* | Upstream proxy URL (HTTP/HTTPS/SOCKS5) for all outgoing requests. |
@@ -105,7 +105,7 @@ edit_res = client.images.edit(
 | `AGY_WEB_CWD` / `AGY_CALLER_CWD` | *(Current directory)* | Preserves workspace working directory when launching Antigravity Web Mode (`agy-proxy web` / `start_proxy.sh --web`). |
 | `ANTIGRAVITY_LS_PATH` | *(Auto)* | Explicit path to `language_server` binary. |
 | `ANTIGRAVITY_EDITOR_PATH` | *(Auto)* | Path to Antigravity editor root directory. |
-| `CLOUD_CODE_URL` | `http://127.0.0.1:8000` | Redirects official `agy` CLI to route via `agy-proxy`. |
+| `CLOUD_CODE_URL` | `http://127.0.0.1:8001` | Redirects official `agy` CLI to route via `agy-proxy`. |
 | `AGY_ACCOUNT` | *(None)* | Selects active account for `agy` CLI sessions from proxy pool (by email, name, or account ID). |
 | `AGY_CLI_AUTO_COMPACT_OVERRIDE` | *(Auto)* | Controls `agy` CLI internal context auto-compaction (`1` or `0`). |
 | `ANTIGRAVITY_CLI_TELEMETRY` | `0` | Disables telemetry reporting in Antigravity CLI and ACP server. |

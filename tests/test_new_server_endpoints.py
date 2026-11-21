@@ -34,7 +34,7 @@ def test_tunnel_endpoints(client, tmp_path, monkeypatch):
     data = res_status.json()
     assert "configured_hosts" in data
 
-    res_snippet = client.get("/api/tunnel/snippet?port=8000")
+    res_snippet = client.get("/api/tunnel/snippet?port=8001")
     assert res_snippet.status_code == 200
     assert "export CLOUD_CODE_URL" in res_snippet.json()["snippet"]
 
@@ -103,24 +103,24 @@ def test_ide_settings_endpoints_lifecycle(client, tmp_path):
     settings_file.write_text('{"editor.tabSize": 2}\n', encoding="utf-8")
 
     res_st1 = client.get(
-        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8000"
+        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8001"
     )
     assert res_st1.status_code == 200
     assert res_st1.json()["configured"] is False
 
     res_apply = client.post(
         "/api/patch/ide-settings",
-        json={"settings_path": str(settings_file), "proxy_url": "http://127.0.0.1:8000"},
+        json={"settings_path": str(settings_file), "proxy_url": "http://127.0.0.1:8001"},
     )
     assert res_apply.status_code == 200
     assert res_apply.json()["success"] is True
 
     res_st2 = client.get(
-        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8000"
+        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8001"
     )
     assert res_st2.status_code == 200
     assert res_st2.json()["configured"] is True
-    assert res_st2.json()["jetski_cloud_code_url"] == "http://127.0.0.1:8000"
+    assert res_st2.json()["jetski_cloud_code_url"] == "http://127.0.0.1:8001"
 
     res_restore = client.post(
         "/api/patch/ide-settings/restore",
@@ -130,7 +130,7 @@ def test_ide_settings_endpoints_lifecycle(client, tmp_path):
     assert res_restore.json()["success"] is True
 
     res_st3 = client.get(
-        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8000"
+        f"/api/patch/ide-settings?settings_path={settings_file}&proxy_url=http://127.0.0.1:8001"
     )
     assert res_st3.json()["configured"] is False
 
@@ -175,9 +175,13 @@ def test_telemetry_sinkhole_and_set_user_settings(tmp_path, monkeypatch):
     assert res_info.json()["userSettings"]["customThemeFlag"] == "solarized"
 
 
-def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
+def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path, monkeypatch):
     from unittest.mock import AsyncMock, Mock
     from agy_proxy.auth import AccountSession
+    from agy_proxy import config
+
+    monkeypatch.setattr(config, "CONFIG_DIR", tmp_path / "agy-proxy")
+    monkeypatch.setattr(config, "CONFIG_FILE", tmp_path / "agy-proxy" / "config.json")
 
     pool = AccountPool(
         accounts_file=tmp_path / "accounts.json",
@@ -185,10 +189,12 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
         web_sessions_file=tmp_path / "web_sessions.json",
     )
     posted_urls = []
+    posted_kwargs = []
 
     class InspectClient:
         async def post(self, url, **kwargs):
             posted_urls.append(url)
+            posted_kwargs.append(kwargs)
             return Mock(
                 status_code=200,
                 text='{"ok": true}',
@@ -217,11 +223,16 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
     assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
 
     r2 = tc.post(
-        "/v1internal:streamGenerateContent",
+        "/v1internal:streamGenerateContent?alt=sse",
         json={"model": "gemini-3.8-flash-high", "request": {"contents": [{"role": "user", "parts": [{"text": "hi"}]}]}},
     )
     assert r2.status_code == 200
-    assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:streamGenerateContent"
+    assert r2.headers["content-type"].startswith("text/event-stream")
+    assert r2.text.startswith("data: ")
+    assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:generateContent"
+    assert "alt" not in posted_kwargs[-1].get("params", {})
+    sent_request = posted_kwargs[-1]["json"]["request"]
+    assert {item["threshold"] for item in sent_request["safetySettings"]} == {"BLOCK_NONE"}
 
     # Consumer account routes to daily-cloudcode-pa
     gcp_acc.enabled = False
