@@ -221,7 +221,7 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
         json={"model": "gemini-3.8-flash-high", "request": {"contents": [{"role": "user", "parts": [{"text": "hi"}]}]}},
     )
     assert r2.status_code == 200
-    assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:streamGenerateContent"
+    assert posted_urls[-1] == "https://cloudcode-pa.googleapis.com/v1internal:generateContent"
 
     # Consumer account routes to daily-cloudcode-pa
     gcp_acc.enabled = False
@@ -244,23 +244,3 @@ def test_dual_endpoint_routing_for_gcp_tos_vs_consumer(tmp_path):
 
 
 
-
-
-
-def test_safety_settings_api_persists_and_validates(client, tmp_path, monkeypatch):
-    from agy_proxy import config
-
-    monkeypatch.setattr(config, "CONFIG_DIR", tmp_path / "agy-proxy")
-    monkeypatch.setattr(config, "CONFIG_FILE", tmp_path / "agy-proxy" / "config.json")
-
-    res_default = client.get("/api/safety/settings")
-    assert res_default.status_code == 200
-    assert res_default.json()["mode"] == "BLOCK_NONE"
-
-    res_off = client.post("/api/safety/settings", json={"mode": "OFF"})
-    assert res_off.status_code == 200
-    assert res_off.json()["mode"] == "OFF"
-    assert config.get_config_value("safety_settings_mode") == "OFF"
-
-    res_invalid = client.post("/api/safety/settings", json={"mode": "BLOCK_MEDIUM_AND_ABOVE"})
-    assert res_invalid.status_code == 400

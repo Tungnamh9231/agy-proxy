@@ -846,7 +846,7 @@ class CloudCodeClient:
                         except Exception as cache_err:
                             logger.debug("Context cache lookup bypassed: %s", cache_err)
 
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent&key={acc.refresh_token}"
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={acc.refresh_token}"
                     else:
                         project = await acc.initialize_project()
                         upstream_base = (
@@ -968,39 +968,45 @@ class CloudCodeClient:
                                 backend_sess_id = payload.get("request", {}).get("sessionId", f"sess-{uuid.uuid4().hex[:8]}")
                                 session_affinity.pin_session(session_key, acc.account_id, backend_sess_id)
 
-                            # generateContent is unary: read the complete JSON body and yield one response.
+                            # generateContent is unary: buffer the full JSON response before parsing.
                             acc.total_requests += 1
                             acc.last_used_timestamp = time.time()
                             acc.last_used_model = backend_m
                             acc.last_client_type = api_source
 
-                            raw_lines = []
-                            async for line in response.aiter_lines():
-                                line = line.strip()
-                                if line:
-                                    raw_lines.append(line)
+                            data_objects = []
+                            try:
+                                await response.aread()
+                            except Exception:
+                                pass
 
-                            if not raw_lines:
-                                raise RuntimeError("CloudCode generateContent returned an empty response")
+                            try:
+                                decoded = response.json()
+                                if isinstance(decoded, dict):
+                                    data_objects = [decoded]
+                            except Exception:
+                                pass
 
-                            # generateContent returns JSON. Accept legacy data: lines defensively,
-                            # but never request the upstream streamGenerateContent endpoint.
-                            if any(line.startswith("data:") for line in raw_lines):
-                                payload_lines = [
-                                    line[5:].strip()
-                                    for line in raw_lines
-                                    if line.startswith("data:") and line[5:].strip() not in ("", "[DONE]")
-                                ]
-                            else:
-                                payload_lines = ["\n".join(raw_lines)]
+                            # Compatibility fallback for legacy SSE-shaped mocks/clients.
+                            if not data_objects:
+                                async for line in response.aiter_lines():
+                                    line = line.strip()
+                                    if not line:
+                                        continue
+                                    raw_json = line[5:].strip() if line.startswith("data:") else line
+                                    if raw_json in ("", "[DONE]"):
+                                        continue
+                                    try:
+                                        decoded = json.loads(raw_json)
+                                    except json.JSONDecodeError:
+                                        continue
+                                    if isinstance(decoded, dict):
+                                        data_objects.append(decoded)
 
-                            for raw_json in payload_lines:
-                                try:
-                                    data_obj = json.loads(raw_json)
-                                except json.JSONDecodeError as e:
-                                    logger.warning("Failed to decode generateContent JSON response: %s", e)
-                                    raise RuntimeError("CloudCode returned invalid JSON from generateContent") from e
+                            if not data_objects:
+                                raise RuntimeError("CloudCode generateContent returned an empty or invalid JSON response")
 
+                            for data_obj in data_objects:
                                 resp_meta = data_obj.get("response", data_obj)
                                 if isinstance(resp_meta, dict):
                                     usage_m = resp_meta.get("usageMetadata", {})

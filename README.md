@@ -69,7 +69,7 @@ Run without needing Python or manual virtual environment setup:
 
 ### 4. Open the Web Dashboard
 
-Open **`http://127.0.0.1:8000`** in your browser to:
+Open **`http://127.0.0.1:8001`** in your browser to:
 - Connect Google accounts via 1-click OAuth (PKCE) or add AI Studio API keys.
 - View real-time quotas, token analytics, and request metrics.
 - Configure context compactor thresholds, proxy tunneling, and Gemini safety thresholds (`BLOCK_NONE` / `OFF`).
@@ -215,7 +215,7 @@ Configure your clients using any of these supported model identifiers:
 ## ⌨️ Common CLI Cheat Sheet
 
 ```bash
-# Start proxy server on default port 8000:
+# Start proxy server on default port 8001:
 agy-proxy start
 
 # Start Antigravity in browser Web mode:
